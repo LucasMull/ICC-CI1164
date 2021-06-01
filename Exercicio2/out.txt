@@ -1,0 +1,226 @@
+***** Sistema 1 --> n = 4, erro: 0.05
+===> Eliminação Gauss: 0.005127 ms
+  --> X: 2.416667 2.583333 1.916667 4.083333 
+  --> Norma L2 do residuo: 8.259062e-07
+
+===> Jacobi: 0.008057 ms --> 7 iterações
+  --> X: 2.390625 2.566406 1.890625 4.066406 
+  --> Norma L2 do residuo: 0.1018625
+
+===> Gauss-Seidel: 0.005127 ms --> 5 iterações
+  --> X: 2.405941 2.57554 1.910909 4.079212 
+  --> Norma L2 do residuo: 0.03605055
+
+***** Sistema 2 --> n = 4, erro: 0.01
+===> Eliminação Gauss: 0.002930 ms
+  --> X: 1.923349 -3.300707 -0.8101413 -1.540094 
+  --> Norma L2 do residuo: 2.980232e-08
+
+===> Jacobi: 0.008057 ms --> 9 iterações
+  --> X: 1.920898 -3.302195 -0.8056519 -1.541822 
+  --> Norma L2 do residuo: 0.007326062
+
+===> Gauss-Seidel: 0.003174 ms --> 5 iterações
+  --> X: 1.922776 -3.300503 -0.8100598 -1.540115 
+  --> Norma L2 do residuo: 0.0004872591
+
+***** Sistema 3 --> n = 3, erro: 0.01
+===> Eliminação Gauss: 0.001953 ms
+  --> X: 9 -3 -2 
+  --> Norma L2 do residuo: 0
+
+===> Jacobi: 0.015137 ms --> 28 iterações
+  --> X: 8.953719 -2.97794 -1.981552 
+  --> Norma L2 do residuo: 0.01802609
+
+===> Gauss-Seidel: 0.008057 ms --> 18 iterações
+  --> X: 8.979407 -2.99058 -1.993136 
+  --> Norma L2 do residuo: 0.01146089
+
+***** Sistema 4 --> n = 3, erro: 0.01
+===> Eliminação Gauss: 0.001953 ms
+  --> X: 9 -3 -2 
+  --> Norma L2 do residuo: 0
+
+===> Jacobi: 0.026123 ms --> 50 iterações
+  --> X: -3165629 1055210 703473.1 
+  --> Norma L2 do residuo: 3355362
+
+===> Refinamento: 0.006104 ms --> 1 iterações
+  --> X: 9 -3 -2 
+  --> Norma L2 do residuo: 0
+
+===> Gauss-Seidel: 0.016846 ms --> 50 iterações
+  --> X: -4.453895e+11 1.484632e+11 2.474386e+11 
+  --> Norma L2 do residuo: 3.129878e+11
+
+===> Refinamento: 0.007080 ms --> 2 iterações
+  --> X: 9 -3 -2 
+  --> Norma L2 do residuo: 0
+
+***** Sistema 5 --> n = 4, erro: 0.05
+===> Eliminação Gauss: 0.002930 ms
+  --> X: 1.000001 -2 3 -4 
+  --> Norma L2 do residuo: 9.536743e-07
+
+===> Jacobi: 0.043945 ms --> 50 iterações
+  --> X: 2.309131e+23 -8.195468e+23 1.200879e+23 3.535872e+22 
+  --> Norma L2 do residuo: inf
+
+===> Refinamento: 0.018799 ms --> 4 iterações
+  --> X: 1.000977 -2.000732 3 -4.000244 
+  --> Norma L2 do residuo: 0.006257815
+
+===> Gauss-Seidel: 0.026855 ms --> 50 iterações
+  --> X: 5.39972e+19 -1.710749e+20 -4.791511e+19 -5.817253e+19 
+  --> Norma L2 do residuo: inf
+
+===> Refinamento: 0.012939 ms --> 3 iterações
+  --> X: 0 -2 3.25 -3.8125 
+  --> Norma L2 do residuo: 1.169268
+
+***** Sistema 6 --> n = 17, erro: 0.01
+===> Eliminação Gauss: 0.061035 ms
+  --> X: -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan inf 
+  --> Norma L2 do residuo: -nan
+
+===> Jacobi: 0.017822 ms --> 1 iterações
+  --> X: -0 -nan -nan -nan -nan -nan -nan -nan -0 -nan -nan -nan -nan -nan -nan -nan -0 
+  --> Norma L2 do residuo: -nan
+
+===> Gauss-Seidel: 0.009033 ms --> 1 iterações
+  --> X: -0 -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
+  --> Norma L2 do residuo: -nan
+
+***** Sistema 7 --> n = 17, erro: 0.01
+===> Eliminação Gauss: 0.064941 ms
+  --> X: -5 35 10 -20 1.666667 35 -0 -20 3.333333 30 0 -0 -3.333333 30 20 -6.666667 20 
+  --> Norma L2 do residuo: 8.42937e-07
+
+===> Jacobi: 0.728027 ms --> 50 iterações
+  --> X: 2711.665 81555.02 10 58145.02 35720.01 86130.03 -0 -47695.01 4180.003 -54920.01 0 -0 -22185.01 3154.996 -18850.01 13091.67 18635.01 
+  --> Norma L2 do residuo: 379681.6
+
+===> Refinamento: 0.098877 ms --> 1 iterações
+  --> X: -4.996826 35.00781 10 -20.00391 1.667969 35.00781 -0 -20.00391 3.334473 29.99609 0 -0 -3.333984 29.99609 20 -6.666992 19.99805 
+  --> Norma L2 do residuo: 0.02250601
+
+===> Gauss-Seidel: 0.365234 ms --> 50 iterações
+  --> X: -3.211732e+11 3.141987e+11 10 6.702443e+11 3.211732e+11 -5.327619e+11 -0 -1.13648e+12 -3.211732e+11 2.331179e+11 0 -0 3.211732e+11 -3.952795e+11 -9.635196e+11 3.211732e+11 -9.635196e+11 
+  --> Norma L2 do residuo: 4.919562e+12
+
+===> Refinamento: 0.288086 ms --> 2 iterações
+  --> X: -5 35 10 -20 1.666016 35 -0 -20 3.333333 30 0 -0 -3.333333 30 20 -6.666667 20 
+  --> Norma L2 do residuo: 0.00390625
+
+***** Sistema 8 --> n = 17, erro: 0.01
+===> Eliminação Gauss: 0.062012 ms
+  --> X: -21.21311 35 10 -20 7.071034 35 -0 -20 14.14207 30 0 -0 -14.14207 30 20 -28.28414 20 
+  --> Norma L2 do residuo: 2.246556e-06
+
+===> Jacobi: 0.723145 ms --> 50 iterações
+  --> X: 11504.53 81554.98 10 58145 151546.4 86130.02 -0 -47694.98 17734.18 -54919.99 0 -0 -94122.55 3154.986 -18850.01 55542.97 18635 
+  --> Norma L2 do residuo: 379681.5
+
+===> Refinamento: 0.506104 ms --> 1 iterações
+  --> X: -21.20215 34.96875 10 -20.00391 7.078125 34.96875 -0 -20 14.14258 29.99609 0 -0 -14.14062 29.99707 19.99414 -28.27734 19.99609 
+  --> Norma L2 do residuo: 0.02825797
+
+===> Gauss-Seidel: 0.311035 ms --> 50 iterações
+  --> X: -1.362616e+12 3.141987e+11 10 6.702443e+11 1.362616e+12 -5.327619e+11 -0 -1.13648e+12 -1.362616e+12 2.331179e+11 0 -0 1.362616e+12 -3.952795e+11 -9.635196e+11 1.362616e+12 -9.635196e+11 
+  --> Norma L2 do residuo: 4.919562e+12
+
+===> Refinamento: 0.157959 ms --> 2 iterações
+  --> X: -21.21156 35 10 -19.99781 7.069488 35 -0 -19.99781 14.14062 29.99219 0 -0 -14.13897 29.99219 19.99781 -28.28105 19.99781 
+  --> Norma L2 do residuo: 0.008865158
+
+***** Sistema 9 --> n = 10, erro: 0.01
+===> Eliminação Gauss: 0.018066 ms
+  --> X: 3 -4.5 7.000002 7.999997 3.499999 2 4 -3.499999 1.999999 1.499998 
+  --> Norma L2 do residuo: 2.501464e-05
+
+===> Jacobi: 0.240967 ms --> 47 iterações
+  --> X: -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
+  --> Norma L2 do residuo: -nan
+
+===> Gauss-Seidel: 0.060059 ms --> 24 iterações
+  --> X: -nan -nan -nan -nan -nan -nan -nan -nan -nan -nan 
+  --> Norma L2 do residuo: -nan
+
+***** Sistema 10 --> n = 10, erro: 1e-07
+===> Eliminação Gauss: 0.013916 ms
+  --> X: -48.64641 -35.49479 -25.61574 -49.09085 -37.71701 -26.96817 -39.31424 -29.53993 -26.87732 -22.96933 
+  --> Norma L2 do residuo: 1.705985e-05
+
+===> Jacobi: 0.242920 ms --> 48 iterações
+  --> X: -48.64641 -35.49479 -25.61574 -49.09086 -37.71701 -26.96817 -39.31424 -29.53993 -26.87732 -22.96933 
+  --> Norma L2 do residuo: 2.123934e-05
+
+===> Gauss-Seidel: 0.061035 ms --> 25 iterações
+  --> X: -48.64641 -35.49479 -25.61574 -49.09086 -37.71701 -26.96817 -39.31424 -29.53993 -26.87732 -22.96933 
+  --> Norma L2 do residuo: 2.123934e-05
+
+***** Sistema 11 --> n = 5, erro: 0.001
+===> Eliminação Gauss: 0.004150 ms
+  --> X: 0.1822737 -4.078742 9.522022 -1.909419 -5.321482 
+  --> Norma L2 do residuo: 2.054277e-05
+
+===> Jacobi: 0.067139 ms --> 50 iterações
+  --> X: -3.020449e+28 -4.604021e+28 -5.652038e+28 -3.384155e+28 -1.225244e+29 
+  --> Norma L2 do residuo: inf
+
+===> Refinamento: 0.029053 ms --> 5 iterações
+  --> X: 0.1796875 -4.080078 9.527344 -1.911133 -5.320312 
+  --> Norma L2 do residuo: 0.1313624
+
+===> Gauss-Seidel: 0.037842 ms --> 50 iterações
+  --> X: -2.14564e+18 -5.972973e+18 -2.454643e+18 9.946504e+18 -2.272305e+19 
+  --> Norma L2 do residuo: inf
+
+===> Refinamento: 0.023926 ms --> 4 iterações
+  --> X: 0.1822738 -4.078742 9.522024 -1.909419 -5.321483 
+  --> Norma L2 do residuo: 3.778765e-05
+
+***** Sistema 12 --> n = 5, erro: 0.001
+===> Eliminação Gauss: 0.002930 ms
+  --> X: 0.1822737 -4.078742 9.522022 -1.909419 -5.321482 
+  --> Norma L2 do residuo: 2.054277e-05
+
+===> Jacobi: 0.067139 ms --> 50 iterações
+  --> X: -inf -inf -inf -inf -inf 
+  --> Norma L2 do residuo: inf
+
+===> Refinamento: 0.006104 ms --> 0 iterações
+  --> X: -nan -nan nan -nan nan 
+  --> Norma L2 do residuo: nan
+
+===> Gauss-Seidel: 0.024170 ms --> 31 iterações
+  --> X: -nan -nan -nan -nan -nan 
+  --> Norma L2 do residuo: -nan
+
+***** Sistema 13 --> n = 5, erro: 0.1
+===> Eliminação Gauss: 0.002930 ms
+  --> X: 0.05354496 0.02504857 0.03643275 0.0464213 0.01654679 
+  --> Norma L2 do residuo: 4.264961e-06
+
+===> Jacobi: 0.000977 ms --> 1 iterações
+  --> X: 0.05598035 0.02815627 0.04053687 0.04844017 0.01886024 
+  --> Norma L2 do residuo: 4.426833
+
+===> Gauss-Seidel: 0.001953 ms --> 1 iterações
+  --> X: 0.05598035 0.02630255 0.03807772 0.04686445 0.01645304 
+  --> Norma L2 do residuo: 1.865907
+
+***** Sistema 14 --> n = 15, erro: 0.001
+===> Eliminação Gauss: 0.044189 ms
+  --> X: 0.0001145405 0.001993356 0.004650201 0.006187106 0.004221655 0.001561881 0.003701068 0.004663879 0.001480684 0.0005735941 0.00264356 0.000443427 0.002818376 0.004403257 0.0021555 
+  --> Norma L2 do residuo: 1.167034e-05
+
+===> Jacobi: 0.026855 ms --> 2 iterações
+  --> X: 0.0001077583 0.001985866 0.004644411 0.00618204 0.004216634 0.00155664 0.003696394 0.004659685 0.00147552 0.0005679233 0.002639374 0.0004390877 0.002813899 0.004398863 0.002152492 
+  --> Norma L2 do residuo: 0.1084807
+
+===> Gauss-Seidel: 0.013916 ms --> 2 iterações
+  --> X: 0.0001114953 0.001990969 0.004648323 0.0061861 0.004221188 0.001561488 0.00370066 0.004663684 0.001480487 0.0005734992 0.002643523 0.0004434627 0.002818403 0.00440328 0.002155518 
+  --> Norma L2 do residuo: 0.01911919
+
