@@ -7,36 +7,58 @@
 #include "SistemasLineares.h"
 
 
-static unsigned int argMax(SistLinear_t *SL, unsigned int pivoLn, unsigned int pivoCol) 
+/*!
+  \brief Retorna o indice da linha pivoLn que possui o maior valor abs
+  \param sistema linear SL
+  \param linha pivoLn
+  \param coluna pivoCol
+  \return Índice do maior valor
+  */
+static unsigned int maxArgIdx(SistLinear_t *SL, unsigned int pivoLn, unsigned int pivoCol) 
 {
-  unsigned int iMax = pivoLn;
+  unsigned int idxMax = pivoLn;
   for (unsigned int i = pivoLn+1; i < SL->n; ++i)
-    if (fabs(SL->A[i][pivoCol] > fabs(SL->A[iMax][pivoCol])))
-      iMax = i;
-  return iMax;
+    if (fabs(SL->A[i][pivoCol] > fabs(SL->A[idxMax][pivoCol])))
+      idxMax = i;
+  return idxMax;
 }
 
-static void lnTroca(SistLinear_t *SL, unsigned int pivoLn, unsigned int iMax)
+/*!
+  \brief Troca linhas pivoLn e idxMax do Sistema Linear
+  \param sistema linear SL
+  \param linha pivoLn
+  \param linha idxMax
+ */
+static void lnTroca(SistLinear_t *SL, unsigned int pivoLn, unsigned int idxMax)
 {
   real_t *auxA = SL->A[pivoLn], auxb = SL->b[pivoLn];
-  SL->A[pivoLn] = SL->A[iMax];
-  SL->A[iMax] = auxA;
-  SL->b[pivoLn] = SL->b[iMax];
-  SL->b[iMax] = auxb;
+  SL->A[pivoLn] = SL->A[idxMax];
+  SL->A[idxMax] = auxA;
+  SL->b[pivoLn] = SL->b[idxMax];
+  SL->b[idxMax] = auxb;
 }
 
+/*!
+  \brief Retorna uma cópia do sistema linear
+  \param sistema linear SL
+  \return Cópia do sistema linear. NULL se houve erro (alocação)
+ */
 static SistLinear_t* dupSistLinear(SistLinear_t *SL)
 {
   SistLinear_t *cpSL = alocaSistLinear(SL->n);
   for (unsigned int i=0; i < SL->n; ++i)
     memcpy(cpSL->A[i], SL->A[i], SL->n*sizeof(real_t));
   memcpy(cpSL->b, SL->b, SL->n*sizeof(real_t));
-
   cpSL->erro = SL->erro;
-
   return cpSL;
 }
 
+/*!
+  \brief Verifica e retorna a maior diferença entre o vetor solução da iteração passada e o da atual
+  \param vetor solução atual
+  \param vetor solução anterior
+  \return Maior diferença encontrada comparando vetor atual com anterior
+ */
 static real_t maiorDif(real_t *atual, real_t *anterior, unsigned int n)
 {
   real_t max=0.0f;
@@ -56,15 +78,13 @@ static real_t maiorDif(real_t *atual, real_t *anterior, unsigned int n)
 */
 real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 {
-  memset(res, 0, SL->n*sizeof(real_t));
+  memset(res, 0, SL->n*sizeof(real_t)); // seta vetor res em 0
 
-  // calcula residuo
-  real_t soma=0.0f, aux;
+  real_t soma=0.0f;
   for (unsigned int i=0; i < SL->n; ++i) {
-    aux=0.0f;
     for (unsigned int j=0; j < SL->n; ++j)
-      aux = fmaf(SL->A[i][j], x[j], aux);
-    res[i] = SL->b[i] - aux;
+      res[i] = fmaf(SL->A[i][j], x[j], res[i]);
+    res[i] = SL->b[i] - res[i];
     soma += powf(res[i], 2.0f);
   }
   return sqrtf(soma);
@@ -83,27 +103,26 @@ int eliminacaoGauss(SistLinear_t *SL, real_t *x, double *tTotal)
 {
   SistLinear_t *cpSL = dupSistLinear(SL);
   unsigned int pivoLn=0, pivoCol=0;
-  unsigned int iMax=0;
+  unsigned int idxMax=0;
 
   *tTotal = timestamp();
 
   while (pivoLn < cpSL->n && pivoCol < cpSL->n) {
-    iMax = argMax(cpSL, pivoLn, pivoCol);
-    if (0.0f == cpSL->A[iMax][pivoCol]) {
+    idxMax = maxArgIdx(cpSL, pivoLn, pivoCol);
+    if (0.0f == cpSL->A[idxMax][pivoCol]) {
       ++pivoCol;
       continue;
     }
 
-    if (iMax != pivoLn){
-      lnTroca(cpSL, pivoLn, iMax);
-    }
+    if (idxMax != pivoLn)
+      lnTroca(cpSL, pivoLn, idxMax);
 
     for (unsigned int i = pivoLn+1; i < cpSL->n; ++i) {
       const real_t coef = cpSL->A[i][pivoCol] / cpSL->A[pivoLn][pivoCol];
       cpSL->A[i][pivoCol] = 0.0f;
       for (unsigned int j = pivoCol+1; j < cpSL->n; ++j)
-        cpSL->A[i][j] = fmaf(-1.0f*cpSL->A[pivoLn][j], coef, cpSL->A[i][j]);
-      cpSL->b[i] = fmaf(-1.0f*cpSL->b[pivoLn], coef, cpSL->b[i]);
+        cpSL->A[i][j] = fmaf(-coef, cpSL->A[pivoLn][j], cpSL->A[i][j]);
+      cpSL->b[i] = fmaf(-coef, cpSL->b[pivoLn], cpSL->b[i]);
     }
     ++pivoLn;
     ++pivoCol;
@@ -145,16 +164,15 @@ int gaussJacobi(SistLinear_t *SL, real_t *x, double *tTotal)
   *tTotal = timestamp();
 
   unsigned int iter=0;
-  while (iter < MAXIT) 
-  {
+  while (iter < MAXIT) {
     ++iter;
 
     for (unsigned int i=0; i < SL->n; ++i) {
       real_t soma=0.0f;
       for (unsigned int j=0; j < SL->n; ++j) {
         if (j != i) 
-          soma += SL->A[i][j]*anterior[j]/SL->A[i][i];
-        atual[i] = (SL->b[i]/SL->A[i][i]) - soma;
+          soma += SL->A[i][j] * anterior[j] / SL->A[i][i];
+        atual[i] = SL->b[i] / SL->A[i][i] - soma;
       }
     }
 
@@ -198,10 +216,10 @@ int gaussSeidel(SistLinear_t *SL, real_t *x, double *tTotal)
     for (unsigned int i=0; i < SL->n; ++i) {
       real_t soma=0.0f;
       for (unsigned int j=0; j < i; ++j)
-        soma += SL->A[i][j] * atual[j];
+        soma = fmaf(SL->A[i][j], atual[j], soma);
       for (unsigned int j = i+1; j < SL->n; ++j)
-        soma += SL->A[i][j] * anterior[j];
-      atual[i] = (SL->b[i] - soma) / SL->A[i][i];
+        soma = fmaf(SL->A[i][j], anterior[j], soma);
+      atual[i] = (SL->b[i] / SL->A[i][i]) - (soma / SL->A[i][i]);
     }
 
     if (SL->erro >= maiorDif(atual, anterior, SL->n))
@@ -239,8 +257,7 @@ int refinamento(SistLinear_t *SL, real_t *x, double *tTotal)
   double auxtTotal = timestamp();
 
   int iter=0;
-  while (iter < MAXIT \
-      && 5.0 < (norma = normaL2Residuo(SL, x, res)) ) 
+  while ((iter < MAXIT) && (5.0 < (norma = normaL2Residuo(SL, x, res))) ) 
   {
     memcpy(cpSL->b, res, cpSL->n*sizeof(real_t));
     eliminacaoGauss(cpSL, w, tTotal);
@@ -310,7 +327,6 @@ SistLinear_t* alocaSistLinear(unsigned int n)
 void liberaSistLinear(SistLinear_t *SL)
 {
   if (!SL) return;
-
   /* por ter sido feita em uma única alocação só é necessário um
    *        único free para SL->A */
   if (SL->A)
