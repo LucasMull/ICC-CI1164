@@ -46,6 +46,7 @@ static void lnTroca(SistLinear_t *SL, unsigned int pivoLn, unsigned int idxMax)
 static SistLinear_t* dupSistLinear(SistLinear_t *SL)
 {
   SistLinear_t *cpSL = alocaSistLinear(SL->n);
+  if (!cpSL) return NULL;
   for (unsigned int i=0; i < SL->n; ++i)
     memcpy(cpSL->A[i], SL->A[i], SL->n*sizeof(real_t));
   memcpy(cpSL->b, SL->b, SL->n*sizeof(real_t));
@@ -102,11 +103,14 @@ real_t normaL2Residuo(SistLinear_t *SL, real_t *x, real_t *res)
 int eliminacaoGauss(SistLinear_t *SL, real_t *x, double *tTotal)
 {
   SistLinear_t *cpSL = dupSistLinear(SL);
+  if (!cpSL) exit(-1);
+
   unsigned int pivoLn=0, pivoCol=0;
   unsigned int idxMax=0;
 
   *tTotal = timestamp();
 
+  _Bool no_solution=0;
   while (pivoLn < cpSL->n && pivoCol < cpSL->n) {
     idxMax = maxArgIdx(cpSL, pivoLn, pivoCol);
     if (0.0f == cpSL->A[idxMax][pivoCol]) {
@@ -123,6 +127,9 @@ int eliminacaoGauss(SistLinear_t *SL, real_t *x, double *tTotal)
       for (unsigned int j = pivoCol+1; j < cpSL->n; ++j)
         cpSL->A[i][j] = fmaf(-coef, cpSL->A[pivoLn][j], cpSL->A[i][j]);
       cpSL->b[i] = fmaf(-coef, cpSL->b[pivoLn], cpSL->b[i]);
+
+      if (!isfinite(coef))
+        no_solution = 1;
     }
     ++pivoLn;
     ++pivoCol;
@@ -133,15 +140,15 @@ int eliminacaoGauss(SistLinear_t *SL, real_t *x, double *tTotal)
     for (int j=i+1; j < cpSL->n; ++j)
       cpSL->b[i] -= cpSL->A[i][j] * cpSL->b[j];
     cpSL->b[i] /= cpSL->A[i][i];
+
+    if (!isfinite(cpSL->b[i]))
+      no_solution = 1;
   }
 
   *tTotal = timestamp() - *tTotal;
-
   memcpy(x, cpSL->b, SL->n*sizeof(real_t));
-
   liberaSistLinear(cpSL);
-
-  return 0;
+  return no_solution;
 }
 
 /*!
@@ -163,17 +170,24 @@ int gaussJacobi(SistLinear_t *SL, real_t *x, double *tTotal)
 
   *tTotal = timestamp();
 
-  unsigned int iter=0;
+  _Bool no_conv=0, no_solution=0;
+  int iter=0;
   while (iter < MAXIT) {
     ++iter;
-
     for (unsigned int i=0; i < SL->n; ++i) {
-      real_t soma=0.0f;
+      real_t soma=0.0f, somaAbs=0.0f;
       for (unsigned int j=0; j < SL->n; ++j) {
-        if (j != i) 
+        if (j != i) {
           soma += SL->A[i][j] * anterior[j] / SL->A[i][i];
+          somaAbs += fabs(SL->A[i][j] * anterior[j] / SL->A[i][i]);
+        }
         atual[i] = SL->b[i] / SL->A[i][i] - soma;
+
+        if (!isfinite(atual[i]))
+          no_solution = 1;
       }
+      if (fabs(SL->A[i][i]) <= somaAbs)
+        no_conv = 1;
     }
 
     if (SL->erro >= maiorDif(atual, anterior, SL->n))
@@ -183,9 +197,10 @@ int gaussJacobi(SistLinear_t *SL, real_t *x, double *tTotal)
   }
 
   *tTotal = timestamp() - *tTotal;
-
   memcpy(x, atual, SL->n*sizeof(real_t));
-
+  
+  if (no_solution) return -2;
+  if (no_conv) return -1;
   return iter;
 }
 
@@ -208,18 +223,28 @@ int gaussSeidel(SistLinear_t *SL, real_t *x, double *tTotal)
 
   *tTotal = timestamp();
 
-  unsigned int iter=0;
+  _Bool no_conv=0, no_solution=0;
+  int iter=0;
   while (iter < MAXIT) 
   {
     ++iter;
 
     for (unsigned int i=0; i < SL->n; ++i) {
-      real_t soma=0.0f;
-      for (unsigned int j=0; j < i; ++j)
+      real_t soma=0.0f, somaAbs=0.0f;
+      for (unsigned int j=0; j < i; ++j) {
         soma = fmaf(SL->A[i][j], atual[j], soma);
-      for (unsigned int j = i+1; j < SL->n; ++j)
+        somaAbs = fmaf(fabs(SL->A[i][j]), fabs(atual[j]), somaAbs);
+      }
+      for (unsigned int j = i+1; j < SL->n; ++j) {
         soma = fmaf(SL->A[i][j], anterior[j], soma);
+        somaAbs = fmaf(fabs(SL->A[i][j]), fabs(anterior[j]), somaAbs);
+      }
       atual[i] = (SL->b[i] / SL->A[i][i]) - (soma / SL->A[i][i]);
+      somaAbs = fabs(SL->b[i] / SL->A[i][i]) - fabs(soma / SL->A[i][i]);
+      if (!isfinite(atual[i]))
+        no_solution = 1;
+      if (fabs(SL->A[i][i]) <= somaAbs)
+        no_conv = 1;
     }
 
     if (SL->erro >= maiorDif(atual, anterior, SL->n))
@@ -229,9 +254,9 @@ int gaussSeidel(SistLinear_t *SL, real_t *x, double *tTotal)
   }
 
   *tTotal = timestamp() - *tTotal;
-
   memcpy(x, atual, SL->n*sizeof(real_t));
-
+  if (no_solution) return -2;
+  if (no_conv) return -1;
   return iter;
 }
 
@@ -251,32 +276,38 @@ int gaussSeidel(SistLinear_t *SL, real_t *x, double *tTotal)
 int refinamento(SistLinear_t *SL, real_t *x, double *tTotal)
 {
   SistLinear_t *cpSL = dupSistLinear(SL);
+  if (!cpSL) exit(-1);
+
   real_t norma;
   real_t res[cpSL->n], w[cpSL->n];
 
   double auxtTotal = timestamp();
 
+  _Bool no_conv=0, no_solution=0;
   int iter=0;
-  while ((iter < MAXIT) && (5.0 < (norma = normaL2Residuo(SL, x, res))) ) 
+  while (((unsigned)iter < MAXIT) && (SL->erro < (norma = normaL2Residuo(SL, x, res)))) 
   {
+    ++iter;
+
     memcpy(cpSL->b, res, cpSL->n*sizeof(real_t));
-    eliminacaoGauss(cpSL, w, tTotal);
-    for (unsigned int i=0; i < cpSL->n; ++i)
+    if (0 != eliminacaoGauss(cpSL, w, tTotal))
+      no_solution = 1;
+
+    for (unsigned int i=0; i < cpSL->n; ++i) {
       x[i] += w[i];
+      if (!isfinite(x[i]))
+        no_solution = 1;
+    }
 
     if (SL->erro >= maiorDif(x, w, SL->n))
       break;
 
     memset(w, 0, cpSL->n*sizeof(real_t));
-
-    ++iter;
   }
 
   *tTotal = timestamp() - auxtTotal;
-
   liberaSistLinear(cpSL);
-
-  return iter;
+  return (no_solution) ? -2 : iter;
 }
 
 /*!
