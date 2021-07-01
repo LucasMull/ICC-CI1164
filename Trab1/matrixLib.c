@@ -1,6 +1,35 @@
+/**
+ * Luan Machado Bernardt | GRR20190363
+ * Lucas Müller          | GRR20197160
+ */
+
 #include "matrixLib.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+/*!
+  \brief Aloca matriz
+
+  \param n tamanho da matriz
+
+  \return ponteiro para matriz. NULL se houve erro de alocação
+  */
+static float** alocaMatrix(unsigned int n) {
+
+  /* efetua alocação de matriz em 1D para facilitar limpeza */
+  float **newMatrix = malloc(n*sizeof(float*) + n*n*sizeof(float));
+  if (!newMatrix)
+    return NULL;
+
+  /* inicializa cada ponteiro para seu bloco de memória
+   *        consecutivo alocado */
+  float *addr = (float*)(newMatrix + n);
+  for (unsigned int i=0; i < n; ++i) {
+    newMatrix[i] = addr;
+    addr += n;
+  }
+  return newMatrix;
+}
 
 // Aloca memoria para a struct t_matrix com tamanho n
 // Retorna um ponteiro para t_matrix ou NULL se houver erro
@@ -10,19 +39,22 @@ t_matrix *alocaStruct(unsigned int n) {
 	if (!newMatrix)
 		return NULL;
 
-	newMatrix->A = malloc(n * sizeof(float *));
+	newMatrix->A = alocaMatrix(n);
 	if (!newMatrix->A)
 		return NULL;
-
-	for (unsigned int i=0; i<n; ++i) {
-		newMatrix->A[i] = malloc(n * sizeof(float));
-		if (!newMatrix->A[i])
-			return NULL;
-	}
-	
+#if 0	
 	newMatrix->L = malloc(n * sizeof(float));
+	if (!newMatrix->L)
+		return NULL;
 	newMatrix->U = malloc(n * sizeof(float));
-	if ((!newMatrix->L) || (!newMatrix->U))
+	if (!newMatrix->U)
+		return NULL;
+#endif
+	newMatrix->L = alocaMatrix(n);
+	if (!newMatrix->L)
+		return NULL;
+	newMatrix->U = alocaMatrix(n);
+	if (!newMatrix->U)
 		return NULL;
 
 	return newMatrix; 

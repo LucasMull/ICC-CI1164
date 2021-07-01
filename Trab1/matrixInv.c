@@ -1,3 +1,8 @@
+/**
+ * Luan Machado Bernardt | GRR20190363
+ * Lucas Müller          | GRR20197160
+ */
+
 #include "matrixLib.h"
 #include <stdlib.h>
 #include <stdio.h>
