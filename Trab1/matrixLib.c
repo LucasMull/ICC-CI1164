@@ -4,7 +4,7 @@
 
 // Aloca memoria para a struct t_matrix com tamanho n
 // Retorna um ponteiro para t_matrix ou NULL se houver erro
-t_matrix *alocaMatrix(unsigned int n) {
+t_matrix *alocaStruct(unsigned int n) {
 
 	t_matrix *newMatrix = malloc(sizeof(t_matrix));
 	if (!newMatrix)
@@ -14,13 +14,17 @@ t_matrix *alocaMatrix(unsigned int n) {
 	if (!newMatrix->A)
 		return NULL;
 
-
 	for (unsigned int i=0; i<n; ++i) {
 		newMatrix->A[i] = malloc(n * sizeof(float));
 		if (!newMatrix->A[i])
 			return NULL;
 	}
 	
+	newMatrix->L = malloc(n * sizeof(float));
+	newMatrix->U = malloc(n * sizeof(float));
+	if ((!newMatrix->L) || (!newMatrix->U))
+		return NULL;
+
 	return newMatrix; 
 }
 
@@ -32,7 +36,7 @@ t_matrix *readMatrix() {
 	float num;
 
 	scanf("%u",&n);
-	t_matrix *newMatrix = alocaMatrix(n);
+	t_matrix *newMatrix = alocaStruct(n);
 	if (!newMatrix) {
 		perror("Erro ao alocar matriz");
 		return NULL;
