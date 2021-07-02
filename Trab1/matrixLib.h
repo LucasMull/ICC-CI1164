@@ -16,3 +16,4 @@ typedef struct {
 t_matrix *alocaStruct(unsigned int n);
 t_matrix *readMatrix();
 void printMatrix(float **matrix, int n);
+int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);

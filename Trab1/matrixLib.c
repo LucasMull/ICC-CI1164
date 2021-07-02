@@ -17,9 +17,9 @@
 static float** alocaMatrix(unsigned int n) {
 
   /* efetua alocação de matriz em 1D para facilitar limpeza */
-  float **newMatrix = malloc(n*sizeof(float*) + n*n*sizeof(float));
+  float **newMatrix = calloc(1, n*sizeof(float*) + n*n*sizeof(float));
   if (!newMatrix)
-    return NULL;
+	return NULL;
 
   /* inicializa cada ponteiro para seu bloco de memória
    *        consecutivo alocado */
@@ -29,6 +29,19 @@ static float** alocaMatrix(unsigned int n) {
     addr += n;
   }
   return newMatrix;
+}
+
+static float** copiaMatrix(t_matrix *Mat) {
+
+	float **aux = alocaMatrix(Mat->n);
+	if (!aux)
+    	return NULL;
+
+	for (unsigned int i=0; i<Mat->n; ++i)
+		for (unsigned int j=0; j<Mat->n; ++j)
+			aux[i][j] = Mat->A[i][j];
+	
+	return aux;
 }
 
 // Aloca memoria para a struct t_matrix com tamanho n
@@ -89,7 +102,41 @@ void printMatrix(float **matrix, int n) {
 
 	for (unsigned int i=0; i<n; ++i) {
 		for (unsigned int j=0; j<n; ++j)
-			printf("%g ",matrix[i][j]);
+			printf("%-10g ",matrix[i][j]);
 		printf("\n");
 	}
+}
+
+int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
+    
+	float **copia = copiaMatrix(Mat);
+    if (!copia) {
+        perror("Erro Eliminacao Gauss: falha ao copiar sistema linear");
+        return -1;
+    }
+    
+    //*tTotal = timestamp();
+    
+    // Transforma a matriz em uma triangular com pivoteamento parcial
+    for (int i=0; i<Mat->n; i++) {
+        //if (pivotP) {
+		//pivo = maxValue(copia,i);
+        //if (pivo != i)
+            //trocaLinha(copia,i,pivo);
+		//}
+
+		Mat->U[i][i] = 1;
+
+        for (int j=i+1; j<Mat->n; j++) {
+            double m = copia[j][i] / copia[i][i];
+            copia[j][i] = 0.0f;
+			Mat->U[j][i] = m;
+            for (int k=i+1; k<Mat->n; k++)
+                copia[j][k] -= copia[i][k] * m;
+        }
+    }
+
+	Mat->L = copia;
+    //*tTotal = timestamp() - *tTotal;
+    return 0;
 }
