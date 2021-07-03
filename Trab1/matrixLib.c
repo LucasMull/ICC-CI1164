@@ -107,6 +107,9 @@ void printMatrix(float **matrix, int n) {
 	}
 }
 
+// Triangulariza a matriz Mat->A n x n
+// Separa Mat->A em L e U
+// Retorna 0 se sucesso e -1 caso contrario
 int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
     
 	float **copia = copiaMatrix(Mat);
