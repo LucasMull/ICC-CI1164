@@ -8,12 +8,23 @@
 #
 #         perfctr 3 FLOPS_DP ./matmult -n 64
 #
-
-LIKWID_CMD="likwid-perfctr -C $1 -g $2 -m"
+# ---- parte Modificada ---- 
+LIKWID_CMD="likwid-perfctr -C 3 -g $1 -m" 
 shift 2
 
-${LIKWID_CMD} $*
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 
+make
+
+for SIZE in 64 100 128 2000 2048
+do
+	${LIKWID_CMD} ./matmult -n $SIZE > ./Resultados/$1_$SIZE.txt
+done
+
+make purge
+
+echo "powersave" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
+# ---------------------------
 # Para obter topologia dos cpu's
 #      likwid-topology -c -g
 

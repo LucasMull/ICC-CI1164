@@ -1,0 +1,138 @@
+--------------------------------------------------------------------------------
+CPU name:	Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz
+CPU type:	Intel Coffeelake processor
+CPU clock:	3.41 GHz
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Region MatPtrVet, Group 1: L3
++-------------------+----------+
+|    Region Info    |  Core 3  |
++-------------------+----------+
+| RDTSC Runtime [s] | 0.000011 |
+|     call count    |        1 |
++-------------------+----------+
+
++-----------------------+---------+--------+
+|         Event         | Counter | Core 3 |
++-----------------------+---------+--------+
+|   INSTR_RETIRED_ANY   |  FIXC0  |  74266 |
+| CPU_CLK_UNHALTED_CORE |  FIXC1  |  51734 |
+|  CPU_CLK_UNHALTED_REF |  FIXC2  |  46576 |
+|    L2_LINES_IN_ALL    |   PMC0  |   1946 |
+|     L2_TRANS_L2_WB    |   PMC1  |    340 |
++-----------------------+---------+--------+
+
++-------------------------------+--------------+
+|             Metric            |    Core 3    |
++-------------------------------+--------------+
+|      Runtime (RDTSC) [s]      | 1.060683e-05 |
+|      Runtime unhalted [s]     | 1.518037e-05 |
+|          Clock [MHz]          |    3785.3640 |
+|              CPI              |       0.6966 |
+|  L3 load bandwidth [MBytes/s] |   11741.8682 |
+|  L3 load data volume [GBytes] |       0.0001 |
+| L3 evict bandwidth [MBytes/s] |    2051.5083 |
+| L3 evict data volume [GBytes] | 2.176000e-05 |
+|    L3 bandwidth [MBytes/s]    |   13793.3765 |
+|    L3 data volume [GBytes]    |       0.0001 |
++-------------------------------+--------------+
+
+Region MatRowVet, Group 1: L3
++-------------------+----------+
+|    Region Info    |  Core 3  |
++-------------------+----------+
+| RDTSC Runtime [s] | 0.000011 |
+|     call count    |        1 |
++-------------------+----------+
+
++-----------------------+---------+--------+
+|         Event         | Counter | Core 3 |
++-----------------------+---------+--------+
+|   INSTR_RETIRED_ANY   |  FIXC0  |  74174 |
+| CPU_CLK_UNHALTED_CORE |  FIXC1  |  47648 |
+|  CPU_CLK_UNHALTED_REF |  FIXC2  |  42600 |
+|    L2_LINES_IN_ALL    |   PMC0  |   1854 |
+|     L2_TRANS_L2_WB    |   PMC1  |    407 |
++-----------------------+---------+--------+
+
++-------------------------------+--------------+
+|             Metric            |    Core 3    |
++-------------------------------+--------------+
+|      Runtime (RDTSC) [s]      | 1.085096e-05 |
+|      Runtime unhalted [s]     | 1.398141e-05 |
+|          Clock [MHz]          |    3811.7890 |
+|              CPI              |       0.6424 |
+|  L3 load bandwidth [MBytes/s] |   10935.0693 |
+|  L3 load data volume [GBytes] |       0.0001 |
+| L3 evict bandwidth [MBytes/s] |    2400.5249 |
+| L3 evict data volume [GBytes] | 2.604800e-05 |
+|    L3 bandwidth [MBytes/s]    |   13335.5943 |
+|    L3 data volume [GBytes]    |       0.0001 |
++-------------------------------+--------------+
+
+Region MatMatPtr, Group 1: L3
++-------------------+----------+
+|    Region Info    |  Core 3  |
++-------------------+----------+
+| RDTSC Runtime [s] | 0.001037 |
+|     call count    |        1 |
++-------------------+----------+
+
++-----------------------+---------+---------+
+|         Event         | Counter |  Core 3 |
++-----------------------+---------+---------+
+|   INSTR_RETIRED_ANY   |  FIXC0  | 8084207 |
+| CPU_CLK_UNHALTED_CORE |  FIXC1  | 3681572 |
+|  CPU_CLK_UNHALTED_REF |  FIXC2  | 3314564 |
+|    L2_LINES_IN_ALL    |   PMC0  |    5726 |
+|     L2_TRANS_L2_WB    |   PMC1  |    1355 |
++-----------------------+---------+---------+
+
++-------------------------------+-----------+
+|             Metric            |   Core 3  |
++-------------------------------+-----------+
+|      Runtime (RDTSC) [s]      |    0.0010 |
+|      Runtime unhalted [s]     |    0.0011 |
+|          Clock [MHz]          | 3785.3032 |
+|              CPI              |    0.4554 |
+|  L3 load bandwidth [MBytes/s] |  353.4926 |
+|  L3 load data volume [GBytes] |    0.0004 |
+| L3 evict bandwidth [MBytes/s] |   83.6504 |
+| L3 evict data volume [GBytes] |    0.0001 |
+|    L3 bandwidth [MBytes/s]    |  437.1430 |
+|    L3 data volume [GBytes]    |    0.0005 |
++-------------------------------+-----------+
+
+Region MatMatRow, Group 1: L3
++-------------------+----------+
+|    Region Info    |  Core 3  |
++-------------------+----------+
+| RDTSC Runtime [s] | 0.000915 |
+|     call count    |        1 |
++-------------------+----------+
+
++-----------------------+---------+---------+
+|         Event         | Counter |  Core 3 |
++-----------------------+---------+---------+
+|   INSTR_RETIRED_ANY   |  FIXC0  | 8084594 |
+| CPU_CLK_UNHALTED_CORE |  FIXC1  | 3436337 |
+|  CPU_CLK_UNHALTED_REF |  FIXC2  | 3089068 |
+|    L2_LINES_IN_ALL    |   PMC0  |    4717 |
+|     L2_TRANS_L2_WB    |   PMC1  |     878 |
++-----------------------+---------+---------+
+
++-------------------------------+-----------+
+|             Metric            |   Core 3  |
++-------------------------------+-----------+
+|      Runtime (RDTSC) [s]      |    0.0009 |
+|      Runtime unhalted [s]     |    0.0010 |
+|          Clock [MHz]          | 3791.0722 |
+|              CPI              |    0.4250 |
+|  L3 load bandwidth [MBytes/s] |  330.0394 |
+|  L3 load data volume [GBytes] |    0.0003 |
+| L3 evict bandwidth [MBytes/s] |   61.4320 |
+| L3 evict data volume [GBytes] |    0.0001 |
+|    L3 bandwidth [MBytes/s]    |  391.4714 |
+|    L3 data volume [GBytes]    |    0.0004 |
++-------------------------------+-----------+
+
