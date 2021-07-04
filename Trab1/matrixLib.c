@@ -55,6 +55,10 @@ t_matrix *alocaStruct(unsigned int n) {
 	newMatrix->A = alocaMatrix(n);
 	if (!newMatrix->A)
 		return NULL;
+
+	newMatrix->Inv = alocaMatrix(n);
+	if (!newMatrix->Inv)
+		return NULL;
 #if 0	
 	newMatrix->L = malloc(n * sizeof(float));
 	if (!newMatrix->L)
@@ -128,18 +132,48 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
             //trocaLinha(copia,i,pivo);
 		//}
 
-		Mat->U[i][i] = 1;
+		Mat->L[i][i] = 1;
 
         for (int j=i+1; j<Mat->n; j++) {
             double m = copia[j][i] / copia[i][i];
             copia[j][i] = 0.0f;
-			Mat->U[j][i] = m;
+			Mat->L[j][i] = m;
             for (int k=i+1; k<Mat->n; k++)
                 copia[j][k] -= copia[i][k] * m;
         }
     }
 
-	Mat->L = copia;
+	Mat->U = copia;
     //*tTotal = timestamp() - *tTotal;
     return 0;
+}
+
+// Fnncao que recebe um inteiro n
+// Retorna a matriz identidade n x n, NULL se der erro 
+float **geraIdentidade(unsigned int n) {
+
+	float **matId = alocaMatrix(n);
+	if (!matId) {
+		perror("Erro ao alocar matriz identidade");
+		return NULL;
+	}
+	
+	for (int i=0; i<n; ++i)
+		matId[i][i] = 1;
+
+	return matId;
+}
+
+// Funcao que recebe t_matrix Mat e matId de tamanho n
+// Calcula o sistema Ly=I e guarda em Mat->Inv
+void LyI(t_matrix *Mat, float **matId) {
+	
+	for (int k=0; k<Mat->n; ++k) {
+		for (int i=0; i<Mat->n; ++i) {
+			Mat->Inv[i][k] = matId[k][i];
+			for (int j=i-1; j>=0; --j)
+				Mat->Inv[i][k] -= Mat->L[i][j] * Mat->Inv[j][k];
+			Mat->Inv[i][k] /= Mat->L[i][i];
+		}
+	}
 }
