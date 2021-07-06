@@ -34,13 +34,10 @@ int main () {
     printf("%.20s\n", "Inversa ##################");
     printMatrix(Mat->Inv,Mat->n);
 
-    float **res = alocaMatrix(Mat->n);
-    float norma = normaL2Residuo(Mat,matId,res);
-    printf("%.20s\n", "Residuo ##################");
-    printMatrix(res,Mat->n);
-    printf("Norma L2: %g\n", norma);
+    printf("# Norma L2 dos residuos: \n");
+    for (unsigned int i=0; i<Mat->n; ++i)
+        printf("%30g\n",normaL2Residuo(Mat,matId[i],i));
 
-    free(res);
     free(matId);
     limpaStruct(Mat);
 

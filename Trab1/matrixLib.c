@@ -106,26 +106,19 @@ void limpaStruct(t_matrix *Mat) {
 
   \return Norma L2 do resíduo.
 */
-float normaL2Residuo(t_matrix *Mat, float **matId, float **res) {
+float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col) {
 
-  // multiplica A x A^-1
-  float **aux = alocaMatrix(Mat->n);
-  for (int i=0; i<Mat->n; ++i)
-    for (int j=0; j<Mat->n; ++j)
-      for (int k=0; k<Mat->n; ++k)
-        aux[i][j] += Mat->A[i][k] * Mat->Inv[k][j];
-
-  float soma=0.0f;
-  for (int k=0; k<Mat->n; ++k) 
-  {
-    for (int i=0; i<Mat->n; ++i) {
-      for (int j=0; j<Mat->n; ++j)
-        res[k][i] = fmaf(aux[i][j], matId[k][j], res[k][i]);
-      res[k][i] = matId[k][i] - res[k][i];
-      soma += powf(res[k][i], 2.0f);
+  float sum = 0.0f;
+  float res[Mat->n];
+    
+    for (unsigned int i=0; i<Mat->n; ++i) {
+        res[i] = 0.0f;
+        for (int j=0; j<Mat->n; ++j)
+            res[i] += Mat->A[i][j] * Mat->Inv[j][i];
+        res[i] = matId[i] - res[i];
+        sum += powf(res[i],2.0f);
     }
-  }
-  return sqrtf(soma);
+    return (sqrtf(sum));
 }
 
 /*!
