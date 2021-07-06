@@ -9,7 +9,7 @@
 #         perfctr 3 FLOPS_DP ./matmult -n 64
 #
 # ---- parte Modificada ---- 
-LIKWID_CMD="likwid-perfctr -C 3 -g $1 -m" 
+LIKWID_CMD="likwid-perfctr -O -C 3 -g $1 -m" 
 shift 2
 
 echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
