@@ -14,9 +14,13 @@ typedef struct {
 } t_matrix;
 
 
+float** alocaMatrix(unsigned int n);
 t_matrix *alocaStruct(unsigned int n);
+void limpaStruct(t_matrix *Mat);
+
+float normaL2Residuo(t_matrix *Mat, float **matId, float **res);
 t_matrix *readMatrix();
 void printMatrix(float **matrix, int n);
 int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
 float **geraIdentidade(unsigned int n);
-int LyI(t_matrix *Mat, float **matId);
+void geraInversa(t_matrix *Mat, float **matId);
