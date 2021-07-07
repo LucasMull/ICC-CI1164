@@ -9,6 +9,8 @@
 #define DIR_PATH "./Resultados" // diretório dos arquivos gerados
 #define N_HEADER_LN 6 // qtd de linhas reservadas ao cabeçalho
 
+#define RUNTIME_FIELD "Runtime (RDTSC) [s]"
+
 const char L3_FILE_PREFIX[] = "L3";
 const char L2_FILE_PREFIX[] = "L2CACHE";
 const char DP_FILE_PREFIX[] = "FLOPS_DP";
@@ -20,11 +22,9 @@ const char DP_FIELD2[] = "AVX DP MFLOP/s";
 
 // valores extraídos a partir dos campos
 struct val {       
-  struct {
-    char region[64]; // nome da tabela
-    double d;        // armazena valores
-  } _[16];
-  size_t n;          // qtd de valores
+  double d[16];        // armazena valores
+  size_t n;            // qtd de valores
+  double runtime;      // tempo de execução
 };
 
 // para qsort()
@@ -32,19 +32,12 @@ int cstrcmp(const void *a, const void *b) {
   return strcmp(*(const char**)a, *(const char**)b);
 }
 
-void printRegion(struct val *data)
-{
-  for (int i=0; i < data->n-1; ++i)
-    printf("%s ", data->_[i].region);
-  printf("%s", data->_[data->n-1].region);
-}
-
 // imprime elementos de struct val lado a lado
 void printTable(struct val *data) 
 {
   for (int i=0; i < data->n-1; ++i)
-    printf("%-10g ", data->_[i].d);
-  printf("%-10g", data->_[data->n-1].d);
+    printf("%-10g ", data->d[i]);
+  printf("%-10g", data->d[data->n-1]);
 }
 
 // recolhe o nome dos arquivos encontrados em folder, com extensão 'ext'
@@ -146,7 +139,7 @@ int main(void)
           case 2048: data = &AVX_2048; break;
           default:   exit(EXIT_FAILURE);
           }
-          data->_[data->n].d = strtod(aux + sizeof(DP_FIELD2), NULL);
+          data->d[data->n] = strtod(aux + sizeof(DP_FIELD2), NULL);
           ++data->n;
         }
         else if (NULL != (aux = strstr(ln, DP_FIELD1))) {
@@ -158,10 +151,23 @@ int main(void)
           case 2048: data = &DP_2048; break;
           default:   exit(EXIT_FAILURE);
           }
-          data->_[data->n].d = strtod(aux + sizeof(DP_FIELD1), NULL);
+          data->d[data->n] = strtod(aux + sizeof(DP_FIELD1), NULL);
           ++data->n;
         }
+        else if (NULL != (aux = strstr(ln, RUNTIME_FIELD))) {
+          switch (size) {
+          case 64:   data = &DP_64;   break;
+          case 100:  data = &DP_100;  break;
+          case 128:  data = &DP_128;  break;
+          case 2000: data = &DP_2000; break;
+          case 2048: data = &DP_2048; break;
+          default:   exit(EXIT_FAILURE);
+          }
+          aux += sizeof(RUNTIME_FIELD);
+          data->runtime = strtod(aux, NULL);
+        }
       }
+      data->runtime /= data->n;
       continue; /* EARLY CONTINUE */
     }
 #if 0
@@ -172,21 +178,32 @@ int main(void)
 #endif
 
     while (fgets(ln, sizeof(ln), f)) {
-      if (NULL != (aux = strstr(ln, "TABLE,Region"))) {
-        aux += sizeof("TABLE,Region");
-        snprintf(data->_[data->n].region,  \
-          sizeof(data->_[data->n].region), \
-          "%.*s", (int)(strchr(aux, ',') - aux), aux);
+      if (NULL != (aux = strstr(ln, RUNTIME_FIELD))) {
+        aux += sizeof(RUNTIME_FIELD);
+        data->runtime = strtod(aux, NULL);
       }
       else if (NULL != (aux = strstr(ln, field))) {
-        data->_[data->n].d = strtod(aux + offset, NULL);
+        data->d[data->n] = strtod(aux + offset, NULL);
         ++data->n;
       }
     }
+    data->runtime /= data->n;
   }
 
-  puts("#N\t\t\tL3");
-  putchar('\t');    printRegion(&L3_64);  putchar('\n');
+  puts("#N\t\t\tRUNTIME\n\tL3\t   L2CACHE    FLOPS_DP   FLOPS_AVX");
+  printf(
+      "64\t%-10g %-10g %-10g %-10g\n"
+      "100\t%-10g %-10g %-10g %-10g\n"
+      "128\t%-10g %-10g %-10g %-10g\n"
+      "2000\t%-10g %-10g %-10g %-10g\n"
+      "2048\t%-10g %-10g %-10g %-10g\n\n",
+      L3_64.runtime, L2_64.runtime, DP_64.runtime, AVX_64.runtime,
+      L3_100.runtime, L2_100.runtime, DP_100.runtime, AVX_100.runtime,
+      L3_128.runtime, L2_128.runtime, DP_128.runtime, AVX_128.runtime,
+      L3_2000.runtime, L2_2000.runtime, DP_2000.runtime, AVX_2000.runtime,
+      L3_2048.runtime, L2_2048.runtime, DP_2048.runtime, AVX_2048.runtime);
+
+  puts("#N\t\t\tL3\n\tMatPtrVet MatRowVet MatMatPtr MatMatRow");
   printf("64\t");   printTable(&L3_64);   putchar('\n');
   printf("100\t");  printTable(&L3_100);  putchar('\n');
   printf("128\t");  printTable(&L3_128);  putchar('\n');
@@ -194,8 +211,7 @@ int main(void)
   printf("2048\t"); printTable(&L3_2048); putchar('\n');
   putchar('\n');
 
-  puts("#N\t\t\tL2CACHE");
-  putchar('\t');    printRegion(&L3_64);  putchar('\n');
+  puts("#N\t\t\tL2CACHE\n\tMatPtrVet MatRowVet MatMatPtr MatMatRow");
   printf("64\t");   printTable(&L2_64);   putchar('\n');
   printf("100\t");  printTable(&L2_100);  putchar('\n');
   printf("128\t");  printTable(&L2_128);  putchar('\n');
@@ -203,8 +219,8 @@ int main(void)
   printf("2048\t"); printTable(&L2_2048); putchar('\n');
   putchar('\n');
 
-  puts("#N\t\t\tFLOPS_DP\t\t\t\t\tFLOPS_AVX");
-  putchar('\t');    printRegion(&L3_64);  printf("\t\t"); printRegion(&L3_64);  putchar('\n');
+  printf("#N\t\t\tFLOPS_DP\t\t\t\t\tFLOPS_AVX\n\tMatPtrVet MatRowVet MatMatPtr MatMatRow\t\t");
+  puts("MatPtrVet MatRowVet MatMatPtr MatMatRow");
   printf("64\t");   printTable(&DP_64);   putchar('\t'); printTable(&AVX_64);   putchar('\n');
   printf("100\t");  printTable(&DP_100);  putchar('\t'); printTable(&AVX_100);  putchar('\n');
   printf("128\t");  printTable(&DP_128);  putchar('\t'); printTable(&AVX_128);  putchar('\n');
