@@ -1,5 +1,5 @@
 PROG   = matmult
-IMPRIME = imprimeTabela
+PRINT = imprimeTabela
 
 CC = gcc -std=c11 -g
 OBJS = matriz.o
@@ -12,13 +12,13 @@ LFLAGS = -L${LIKWID_LIB} -llikwid -lm
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $<
 
-all: $(IMPRIME) $(PROG)
+all: $(PRINT) $(PROG)
 
 debug: CFLAGS += -DDEBUG
 debug: $(PROG)
 
 $(PROG):  $(PROG).o
-$(IMPRIME): 
+$(PRINT): 
 	$(CC) $(CFLAGS) -o $@ $@.c
 
 $(PROG): $(OBJS) 
@@ -30,5 +30,5 @@ clean limpa:
 
 purge faxina:   clean
 	@echo "Faxina ...."
-	@rm -f  $(PROG) *.o core a.out
+	@rm -f  $(PROG) $(PRINT) *.o core a.out
 	@rm -f *.png marker.out *.log
