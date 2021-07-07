@@ -20,8 +20,11 @@ const char DP_FIELD2[] = "AVX DP MFLOP/s";
 
 // valores extraídos a partir dos campos
 struct val {       
-  double d[25]; // armazena valores
-  size_t n;     // qtd de valores
+  struct {
+    char region[64]; // nome da tabela
+    double d;        // armazena valores
+  } _[16];
+  size_t n;          // qtd de valores
 };
 
 // para qsort()
@@ -29,12 +32,19 @@ int cstrcmp(const void *a, const void *b) {
   return strcmp(*(const char**)a, *(const char**)b);
 }
 
+void printRegion(struct val *data)
+{
+  for (int i=0; i < data->n-1; ++i)
+    printf("%s ", data->_[i].region);
+  printf("%s", data->_[data->n-1].region);
+}
+
 // imprime elementos de struct val lado a lado
 void printTable(struct val *data) 
 {
   for (int i=0; i < data->n-1; ++i)
-    printf("%-10g ", data->d[i]);
-  printf("%-10g", data->d[data->n-1]);
+    printf("%-10g ", data->_[i].d);
+  printf("%-10g", data->_[data->n-1].d);
 }
 
 // recolhe o nome dos arquivos encontrados em folder, com extensão 'ext'
@@ -136,7 +146,7 @@ int main(void)
           case 2048: data = &AVX_2048; break;
           default:   exit(EXIT_FAILURE);
           }
-          data->d[data->n] = strtod(aux + sizeof(DP_FIELD2), NULL);
+          data->_[data->n].d = strtod(aux + sizeof(DP_FIELD2), NULL);
           ++data->n;
         }
         else if (NULL != (aux = strstr(ln, DP_FIELD1))) {
@@ -148,12 +158,11 @@ int main(void)
           case 2048: data = &DP_2048; break;
           default:   exit(EXIT_FAILURE);
           }
-          data->d[data->n] = strtod(aux + sizeof(DP_FIELD1), NULL);
+          data->_[data->n].d = strtod(aux + sizeof(DP_FIELD1), NULL);
           ++data->n;
         }
       }
-      field = NULL;
-      offset = 0;
+      continue; /* EARLY CONTINUE */
     }
 #if 0
     else {
@@ -161,20 +170,23 @@ int main(void)
       exit(EXIT_FAILURE);
     }
 #endif
-    if (!field) {
-      fclose(f);
-      continue;
-    }
 
     while (fgets(ln, sizeof(ln), f)) {
-      if (NULL != (aux = strstr(ln, field))) {
-        data->d[data->n] = strtod(aux + offset, NULL);
+      if (NULL != (aux = strstr(ln, "TABLE,Region"))) {
+        aux += sizeof("TABLE,Region");
+        snprintf(data->_[data->n].region,  \
+          sizeof(data->_[data->n].region), \
+          "%.*s", (int)(strchr(aux, ',') - aux), aux);
+      }
+      else if (NULL != (aux = strstr(ln, field))) {
+        data->_[data->n].d = strtod(aux + offset, NULL);
         ++data->n;
       }
     }
   }
 
   puts("#N\t\t\tL3");
+  putchar('\t');    printRegion(&L3_64);  putchar('\n');
   printf("64\t");   printTable(&L3_64);   putchar('\n');
   printf("100\t");  printTable(&L3_100);  putchar('\n');
   printf("128\t");  printTable(&L3_128);  putchar('\n');
@@ -183,6 +195,7 @@ int main(void)
   putchar('\n');
 
   puts("#N\t\t\tL2CACHE");
+  putchar('\t');    printRegion(&L3_64);  putchar('\n');
   printf("64\t");   printTable(&L2_64);   putchar('\n');
   printf("100\t");  printTable(&L2_100);  putchar('\n');
   printf("128\t");  printTable(&L2_128);  putchar('\n');
@@ -191,11 +204,12 @@ int main(void)
   putchar('\n');
 
   puts("#N\t\t\tFLOPS_DP\t\t\t\t\tFLOPS_AVX");
-  printf("64\t");   printTable(&L2_64);   putchar('\t'); printTable(&AVX_64);   putchar('\n');
-  printf("100\t");  printTable(&L2_100);  putchar('\t'); printTable(&AVX_100);  putchar('\n');
-  printf("128\t");  printTable(&L2_128);  putchar('\t'); printTable(&AVX_128);  putchar('\n');
-  printf("2000\t"); printTable(&L2_2000); putchar('\t'); printTable(&AVX_2000); putchar('\n');
-  printf("2048\t"); printTable(&L2_2048); putchar('\t'); printTable(&AVX_2048); putchar('\n');
+  putchar('\t');    printRegion(&L3_64);  printf("\t\t"); printRegion(&L3_64);  putchar('\n');
+  printf("64\t");   printTable(&DP_64);   putchar('\t'); printTable(&AVX_64);   putchar('\n');
+  printf("100\t");  printTable(&DP_100);  putchar('\t'); printTable(&AVX_100);  putchar('\n');
+  printf("128\t");  printTable(&DP_128);  putchar('\t'); printTable(&AVX_128);  putchar('\n');
+  printf("2000\t"); printTable(&DP_2000); putchar('\t'); printTable(&AVX_2000); putchar('\n');
+  printf("2048\t"); printTable(&DP_2048); putchar('\t'); printTable(&AVX_2048); putchar('\n');
   putchar('\n');
 
   return EXIT_SUCCESS;
