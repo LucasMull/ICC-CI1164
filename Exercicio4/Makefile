@@ -1,7 +1,8 @@
 PROG   = matmult
+IMPRIME = imprimeTabela
 
 CC = gcc -std=c11 -g
-OBJS = imprimeTabela.o matriz.o
+OBJS = matriz.o
 
 CFLAGS = -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native 
 LFLAGS = -L${LIKWID_LIB} -llikwid -lm
@@ -11,12 +12,14 @@ LFLAGS = -L${LIKWID_LIB} -llikwid -lm
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $<
 
-all: $(PROG)
+all: $(IMPRIME) $(PROG)
 
 debug: CFLAGS += -DDEBUG
 debug: $(PROG)
 
 $(PROG):  $(PROG).o
+$(IMPRIME): 
+	$(CC) $(CFLAGS) -o $@ $@.c
 
 $(PROG): $(OBJS) 
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
