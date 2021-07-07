@@ -3,7 +3,7 @@ CFLAGS =
 LFLAGS = -lm
 
 PROG = matrixInv 
-OBJS = matrixLib.o
+OBJS = matrixLib.o utils.o
 
 .PHONY: limpa faxina clean purge all
 

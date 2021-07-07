@@ -12,32 +12,29 @@ int main () {
 
     t_matrix *Mat;
     float **matId;
-    double tempo;
+    double tempoTri, tempoUx, tempoLy;
 
     Mat = readMatrix();
 
-    triangularizaMatrix(Mat,0,&tempo);
+    triangularizaMatrix(Mat,0,&tempoTri);
     printf("%.20s\n", "Original ##################");
     printMatrix(Mat->A,Mat->n);
 
-    printf("%.20s\n", "U ##################");
-    printMatrix(Mat->U,Mat->n);
-
-    printf("%.20s\n", "L ##################");
-    printMatrix(Mat->L,Mat->n);
-
     matId = geraIdentidade(Mat->n);
-    printf("%.20s\n", "Identidade ##################");
-    printMatrix(matId,Mat->n);
 
-    geraInversa(Mat,matId);
+    geraInversa(Mat,matId,&tempoLy,&tempoUx);
     printf("%.20s\n", "Inversa ##################");
     printMatrix(Mat->Inv,Mat->n);
-
+    printf("###############\n");
+    printf("# Tempo Triangularização: %g ms\n",tempoTri);
+    printf("# Tempo cálculo de Y: %g ms\n",tempoLy);
+    printf("# Tempo cálculo de X: %g ms\n",tempoUx);
     for (unsigned int i=0; i<Mat->n; ++i) {
         printf("# Norma L2 dos residuos (%d): ", i);
         printf("%g\n",normaL2Residuo(Mat,matId[i],i));
     }
+     printf("###############\n");
+    
     free(matId);
     limpaStruct(Mat);
 

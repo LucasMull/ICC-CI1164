@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "utils.h"
 #include "matrixLib.h"
 
 /*!
@@ -157,11 +158,13 @@ t_matrix *readMatrix() {
 */
 void printMatrix(float **matrix, int n) {
 
-	for (unsigned int i=0; i<n; ++i) {
+	printf("\n");
+  for (unsigned int i=0; i<n; ++i) {
 		for (unsigned int j=0; j<n; ++j)
 			printf("%-10g ",matrix[i][j]);
 		printf("\n");
 	}
+  printf("\n");
 }
 
 /*!
@@ -181,9 +184,7 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
         return -1;
     }
     
-#if 0
     *tTotal = timestamp();
-#endif
     
     // Transforma a matriz em uma triangular com pivoteamento parcial
     for (int i=0; i<Mat->n; i++) 
@@ -207,9 +208,8 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
 
     /// @todo Mat->U é alocado em alocaStruct, é preciso copiar conteúdo de 'copia' para Mat->U, ou então não alocar memória para Mat->U
     Mat->U = copia;
-#if 0
+
     *tTotal = timestamp() - *tTotal;
-#endif
 
     return 0;
 }
@@ -241,10 +241,11 @@ float **geraIdentidade(unsigned int n) {
   \param Mat matriz original a ser invertida
   \param matId matriz identidade
 */
-void geraInversa(t_matrix *Mat, float **matId) {
+void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx) {
 	
   // Calcula Ly=I
-	for (int k=0; k<Mat->n; ++k) 
+	*timeLy = timestamp();
+  for (int k=0; k<Mat->n; ++k) 
   {
 		for (int i=0; i<Mat->n; ++i) {
 			Mat->Inv[i][k] = matId[k][i];
@@ -253,8 +254,10 @@ void geraInversa(t_matrix *Mat, float **matId) {
 			Mat->Inv[i][k] /= Mat->L[i][i];
 		}
 	}
+  *timeLy = timestamp() - *timeLy;
 
   // Calcula Ux=y
+  *timeUx = timestamp();
 	for (int k=0; k<Mat->n; ++k) 
   {
 		for (int i=Mat->n-1; i>=0; --i) {
@@ -263,4 +266,5 @@ void geraInversa(t_matrix *Mat, float **matId) {
 			Mat->Inv[i][k] /= Mat->U[i][i];
 		}
 	}
+  *timeUx = timestamp() - *timeUx;
 }

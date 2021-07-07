@@ -3,6 +3,9 @@
  * Lucas Müller          | GRR20197160
  */
 
+#ifndef __MATRIXLIB__
+#define __MATRIXLIB__
+
 typedef struct {
     unsigned int n;
     float **A;
@@ -23,4 +26,5 @@ t_matrix *readMatrix();
 void printMatrix(float **matrix, int n);
 int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
 float **geraIdentidade(unsigned int n);
-void geraInversa(t_matrix *Mat, float **matId);
+void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx);
+#endif
