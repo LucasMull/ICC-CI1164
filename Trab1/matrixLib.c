@@ -101,22 +101,22 @@ void limpaStruct(t_matrix *Mat) {
   \brief Essa função calcula a norma L2 do resíduo de uma matriz 
 
   \param Mat ponteiro para a matriz
-  \param Mat ponteiro para a matriz identidade
-  \param res Valor do resíduo
+  \param matId ponteiro para a matriz identidade
+  \param col Coluna de matInv a ser multiplicada
 
   \return Norma L2 do resíduo.
 */
 float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col) {
 
   float sum = 0.0f;
-  float res[Mat->n];
+  float res;
     
     for (unsigned int i=0; i<Mat->n; ++i) {
-        res[i] = 0.0f;
+        res = 0.0f;
         for (int j=0; j<Mat->n; ++j)
-            res[i] += Mat->A[i][j] * Mat->Inv[j][i];
-        res[i] = matId[i] - res[i];
-        sum += powf(res[i],2.0f);
+            res += Mat->A[i][j] * Mat->Inv[j][col];
+        res = matId[i] - res;
+        sum += powf(res,2.0f);
     }
     return (sqrtf(sum));
 }

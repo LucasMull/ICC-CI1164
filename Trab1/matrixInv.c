@@ -34,10 +34,10 @@ int main () {
     printf("%.20s\n", "Inversa ##################");
     printMatrix(Mat->Inv,Mat->n);
 
-    printf("# Norma L2 dos residuos: \n");
-    for (unsigned int i=0; i<Mat->n; ++i)
-        printf("%30g\n",normaL2Residuo(Mat,matId[i],i));
-
+    for (unsigned int i=0; i<Mat->n; ++i) {
+        printf("# Norma L2 dos residuos (%d): ", i);
+        printf("%g\n",normaL2Residuo(Mat,matId[i],i));
+    }
     free(matId);
     limpaStruct(Mat);
 
