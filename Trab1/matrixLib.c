@@ -79,8 +79,8 @@ t_matrix *alocaStruct(unsigned int n) {
 
 	newMatrix->L = alocaMatrix(n);
 	if (!newMatrix->L) return NULL;
-	newMatrix->U = alocaMatrix(n);
-	if (!newMatrix->U) return NULL;
+	/*newMatrix->U = alocaMatrix(n);
+	if (!newMatrix->U) return NULL;*/
 	return newMatrix; 
 }
 
@@ -168,6 +168,42 @@ void printMatrix(float **matrix, int n) {
 }
 
 /*!
+  \brief Encontra o maior valor em uma coluna da matriz Mat
+
+  \param Mat struct com a matriz
+  \param n dimensao da matriz Mat
+  \param i coluna
+  \return indice da coluna com max
+*/
+static unsigned int maxValue (float **Mat, unsigned int n, unsigned int i) {
+
+    unsigned int max = i;
+    
+    for (int j=i+1; j<n; j++) {
+        if (fabs(Mat[j][i]) > fabs(Mat[max][i]))
+          max = j;
+    }
+    
+    return max;
+}
+
+/*!
+  \brief Troca linhas da matriz Mat->A
+
+  \param Mat matriz
+  \param i linha a ser trocada com j
+  \param j linha a ser trocada com i
+*/
+static void trocaLinha (float **Mat, unsigned int i, unsigned int j) {
+
+    float *aAux;
+
+    aAux = Mat[i];
+    Mat[i] = Mat[j];
+    Mat[j] = aAux;
+}
+
+/*!
   \brief Triangulariza a matriz Mat->a de norma n
   \note separa Mat->a em L e U
 
@@ -186,30 +222,45 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
     
     *tTotal = timestamp();
     
-    // Transforma a matriz em uma triangular com pivoteamento parcial
-    for (int i=0; i<Mat->n; i++) 
-    {
-#if 0
-        if (pivotP) {
-          pivo = maxValue(copia,i);
-          if (pivo != i)
+    if (pivotP) {
+      // Transforma a matriz em uma triangular com pivoteamento parcial
+      unsigned int pivo;
+      
+      for (int i=0; i<Mat->n; i++) 
+      {
+          pivo = maxValue(copia,Mat->n,i);
+          if (pivo != i) {
               trocaLinha(copia,i,pivo);
-        }
-#endif
-        Mat->L[i][i] = 1;
-        for (int j=i+1; j<Mat->n; j++) {
-            double m = copia[j][i] / copia[i][i];
-            copia[j][i] = 0.0f;
-            Mat->L[j][i] = m;
-            for (int k=i+1; k<Mat->n; k++)
-                copia[j][k] -= copia[i][k] * m;
-        }
-    }
+          }
 
+          Mat->L[i][i] = 1;
+          for (int j=i+1; j<Mat->n; j++) {
+              double m = copia[j][i] / copia[i][i];
+              copia[j][i] = 0.0f;
+              Mat->L[j][i] = m;
+              for (int k=i+1; k<Mat->n; k++)
+                  copia[j][k] -= copia[i][k] * m;
+          }
+      }
+      *tTotal = timestamp() - *tTotal;
+    
+    } else {
+      // Transforma a matriz em uma triangular sem pivoteamento
+      for (int i=0; i<Mat->n; i++) 
+      {
+          Mat->L[i][i] = 1;
+          for (int j=i+1; j<Mat->n; j++) {
+              double m = copia[j][i] / copia[i][i];
+              copia[j][i] = 0.0f;
+              Mat->L[j][i] = m;
+              for (int k=i+1; k<Mat->n; k++)
+                  copia[j][k] -= copia[i][k] * m;
+          }
+      }
+      *tTotal = timestamp() - *tTotal;
+    }
     /// @todo Mat->U é alocado em alocaStruct, é preciso copiar conteúdo de 'copia' para Mat->U, ou então não alocar memória para Mat->U
     Mat->U = copia;
-
-    *tTotal = timestamp() - *tTotal;
 
     return 0;
 }
@@ -240,6 +291,8 @@ float **geraIdentidade(unsigned int n) {
   Calcula o sistema Ly=I e Ux=y e armazena em Mat->Inv
   \param Mat matriz original a ser invertida
   \param matId matriz identidade
+  \param timeLy tempo para calculo de Ly=I
+  \param timeUx tempo para calculo de Ux=y
 */
 void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx) {
 	

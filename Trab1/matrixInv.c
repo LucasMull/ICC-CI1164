@@ -5,20 +5,36 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <getopt.h>
 
 #include "matrixLib.h"
 
-int main () {
+int main (int argc, char **argv) {
 
     t_matrix *Mat;
     float **matId;
     double tempoTri, tempoUx, tempoLy;
+    char opt;
+    char *output = NULL;
+    int pivotP = 0;
+
+    while ((opt = getopt(argc,argv,"po:")) > 0) {
+        switch(opt) {
+            case 'p':
+                pivotP = 1;
+                break;
+            case 'o':
+                output = optarg;
+                break;
+        }
+    }
 
     Mat = readMatrix();
-
-    triangularizaMatrix(Mat,0,&tempoTri);
+    
     printf("%.20s\n", "Original ##################");
     printMatrix(Mat->A,Mat->n);
+    triangularizaMatrix(Mat,pivotP,&tempoTri);
+    
 
     matId = geraIdentidade(Mat->n);
 

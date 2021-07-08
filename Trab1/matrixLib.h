@@ -20,7 +20,6 @@ typedef struct {
 float** alocaMatrix(unsigned int n);
 t_matrix *alocaStruct(unsigned int n);
 void limpaStruct(t_matrix *Mat);
-
 float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col);
 t_matrix *readMatrix();
 void printMatrix(float **matrix, int n);
