@@ -231,6 +231,7 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
           pivo = maxValue(copia,Mat->n,i);
           if (pivo != i) {
               trocaLinha(copia,i,pivo);
+              trocaLinha(Mat->A,i,pivo);
           }
 
           Mat->L[i][i] = 1;
