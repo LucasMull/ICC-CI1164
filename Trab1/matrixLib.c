@@ -130,25 +130,50 @@ float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col) {
 */
 t_matrix *readMatrix() {
 
-	unsigned int n;
-	float num;
+    char ln[1024];
+    
+    // extrai a linha contendo a ordem da matriz
+    if (!fgets(ln, sizeof(ln), stdin)) {
+        perror("Falha de leitura");
+        return NULL;
+    }
+    unsigned int n = strtoul(ln, NULL, 10);
+    if (!n) {
+        fputs("Não foi possível obter ordem de matriz\n", stderr);
+        return NULL;
+    }
 
-	scanf("%u",&n);
-	t_matrix *newMatrix = alocaStruct(n);
-	if (!newMatrix) {
-		perror("Erro ao alocar matriz");
-		return NULL;
-	} 
+    // realiza alocação do Sistema Linear
+    t_matrix *newMatrix = alocaStruct(n);
+    if (!newMatrix) {
+        fputs("Não foi possível alocar 'newMatrix'\n", stderr);
+        return NULL;
+    }
+    newMatrix->n = n;
 
-	newMatrix->n = n;
+    // extrai as linhas contendo os elementos da matriz
+    char *valorAtual, *valorProx;
+    for (unsigned int i=0; i < newMatrix->n; ++i) {
+        valorAtual = ln;
+        if (!fgets(ln, sizeof(ln), stdin)) {
+            perror("Falha de leitura");
+            return NULL;
+        }
 
-	for (unsigned int i=0; i<n; ++i)
-		for (unsigned int j=0; j<n; ++j) {
-			scanf("%f",&num);
-			newMatrix->A[i][j] = num;
-		}
+        for (unsigned int j=0; j < newMatrix->n; ++j) {
+            newMatrix->A[i][j] = strtof(valorAtual, &valorProx);
+            if (!valorProx) {
+                fputs("Não foi possível obter o próximo valor\n", stderr);
+                return NULL;
+            }
+            valorAtual = valorProx;
+        }
+    }
+    
+    // "consome" próxima linha (vazia ou parada em EOF)
+    fgets(ln, sizeof(ln), stdin);
 
-	return newMatrix;
+    return newMatrix;
 }
 
 /*!
@@ -157,15 +182,15 @@ t_matrix *readMatrix() {
   \param matrix matriz a ser impressa
   \param n tamanho da matriz
 */
-void printMatrix(float **matrix, int n) {
+void printMatrix(FILE *f_out, float **matrix, int n) {
 
-	printf("\n");
+	fprintf(f_out,"\n");
   for (unsigned int i=0; i<n; ++i) {
 		for (unsigned int j=0; j<n; ++j)
-			printf("%-10g ",matrix[i][j]);
-		printf("\n");
+			fprintf(f_out,"%-10g ",matrix[i][j]);
+		fprintf(f_out,"\n");
 	}
-  printf("\n");
+  fprintf(f_out,"\n");
 }
 
 /*!
@@ -246,8 +271,6 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
                   copia[j][k] -= copia[i][k] * m;
           }
       }
-      *tTotal = timestamp() - *tTotal;
-    
     } else {
       // Transforma a matriz em uma triangular sem pivoteamento
       for (int i=0; i<Mat->n; i++) 
@@ -261,8 +284,10 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
                   copia[j][k] -= copia[i][k] * m;
           }
       }
-      *tTotal = timestamp() - *tTotal;
     }
+
+    *tTotal = timestamp() - *tTotal;
+
     /// @todo Mat->U é alocado em alocaStruct, é preciso copiar conteúdo de 'copia' para Mat->U, ou então não alocar memória para Mat->U
     Mat->U = copia;
 

@@ -23,7 +23,7 @@ t_matrix *alocaStruct(unsigned int n);
 void limpaStruct(t_matrix *Mat);
 float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col);
 t_matrix *readMatrix();
-void printMatrix(float **matrix, int n);
+void printMatrix(FILE *f_out, float **matrix, int n);
 int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
 float **geraIdentidade(unsigned int n);
 void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx);
