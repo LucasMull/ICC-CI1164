@@ -12,7 +12,6 @@
 int main (int argc, char **argv) {
 
     t_matrix *Mat;
-    float **matId;
     double tempoTri, tempoUx, tempoLy;
     char opt;
     char *output = NULL;
@@ -33,25 +32,24 @@ int main (int argc, char **argv) {
     
     printf("%.20s\n", "Original ##################");
     printMatrix(Mat->A,Mat->n);
-    triangularizaMatrix(Mat,pivotP,&tempoTri);
     
+    Mat->Id = geraIdentidade(Mat->n);
+    triangularizaMatrix(Mat,pivotP,&tempoTri);
 
-    matId = geraIdentidade(Mat->n);
-
-    geraInversa(Mat,matId,&tempoLy,&tempoUx);
+    geraInversa(Mat,Mat->Id,&tempoLy,&tempoUx);
     printf("%.20s\n", "Inversa ##################");
     printMatrix(Mat->Inv,Mat->n);
+
     printf("###############\n");
     printf("# Tempo Triangularização: %g ms\n",tempoTri);
     printf("# Tempo cálculo de Y: %g ms\n",tempoLy);
     printf("# Tempo cálculo de X: %g ms\n",tempoUx);
     for (unsigned int i=0; i<Mat->n; ++i) {
         printf("# Norma L2 dos residuos (%d): ", i);
-        printf("%g\n",normaL2Residuo(Mat,matId[i],i));
+        printf("%g\n",normaL2Residuo(Mat,Mat->Id[i],i));
     }
      printf("###############\n");
-    
-    free(matId);
+
     limpaStruct(Mat);
 
     return EXIT_SUCCESS;

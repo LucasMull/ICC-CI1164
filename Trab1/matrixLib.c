@@ -93,6 +93,7 @@ void limpaStruct(t_matrix *Mat) {
 
   free(Mat->A);
   free(Mat->Inv);
+  free(Mat->Id);
   free(Mat->L);
   free(Mat->U);
   free(Mat);
@@ -232,6 +233,8 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
           if (pivo != i) {
               trocaLinha(copia,i,pivo);
               trocaLinha(Mat->A,i,pivo);
+              trocaLinha(Mat->Id,i,pivo);
+              trocaLinha(Mat->L,i,pivo);
           }
 
           Mat->L[i][i] = 1;

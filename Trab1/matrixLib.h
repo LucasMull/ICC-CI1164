@@ -10,6 +10,7 @@ typedef struct {
     unsigned int n;
     float **A;
     float **Inv;
+    float **Id;
 #if 0
     float *L, *U;
 #endif
