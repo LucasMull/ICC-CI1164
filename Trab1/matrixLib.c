@@ -21,8 +21,10 @@ float** alocaMatrix(unsigned int n) {
 
   /* efetua alocação de matriz em 1D para facilitar limpeza */
   float **newMatrix = calloc(1, n*sizeof(float*) + n*n*sizeof(float));
-  if (!newMatrix) return NULL;
-
+  if (!newMatrix) {
+    perror("Falha ao alocar matriz\n");
+    return NULL;
+  }
   /* inicializa cada ponteiro para seu bloco de memória
    *        consecutivo alocado */
   float *addr = (float*)(newMatrix + n);
@@ -242,7 +244,7 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
     
     float **copia = copiaMatrix(Mat);
     if (!copia) {
-        perror("Erro Eliminacao Gauss: falha ao copiar sistema linear");
+        perror("Erro Triangularizacao: falha ao copiar matriz");
         return -1;
     }
     
