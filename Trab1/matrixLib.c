@@ -81,8 +81,11 @@ t_matrix *alocaStruct(unsigned int n) {
 
 	newMatrix->L = alocaMatrix(n);
 	if (!newMatrix->L) return NULL;
-	/*newMatrix->U = alocaMatrix(n);
-	if (!newMatrix->U) return NULL;*/
+
+#if 0
+	newMatrix->U = alocaMatrix(n);
+	if (!newMatrix->U) return NULL;
+#endif
 	return newMatrix; 
 }
 

@@ -27,4 +27,5 @@ void printMatrix(FILE *f_out, float **matrix, int n);
 int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
 float **geraIdentidade(unsigned int n);
 void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx);
-#endif
+
+#endif // __MATRIXLIB__
