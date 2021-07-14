@@ -49,11 +49,11 @@ int main (int argc, char **argv) {
         Mat->Id = geraIdentidade(Mat->n);
         if (triangularizaMatrix(Mat,pivotP,&tempoTri) != -1) {
 
-            geraInversa(Mat,Mat->Id,&tempoLy,&tempoUx);
+            geraInversa(Mat,&tempoLy,&tempoUx);
             fprintf(f_out,"%.20s\n", "Inversa ##################");
             printMatrix(f_out,Mat->Inv,Mat->n);
 
-            fprintf(f_out,"###############\n");
+            fprintf(f_out,"###########\n");
             fprintf(f_out,"# Tempo Triangularizacao: %e ms\n",tempoTri);
             fprintf(f_out,"# Tempo calculo de Y: %e ms\n",tempoLy);
             fprintf(f_out,"# Tempo calculo de X: %e ms\n",tempoUx);
@@ -61,7 +61,7 @@ int main (int argc, char **argv) {
                 fprintf(f_out,"# Norma L2 dos residuos (%d): ", i);
                 fprintf(f_out,"%g\n",normaL2Residuo(Mat,Mat->Id[i],i));
             }
-            fprintf(f_out,"###############\n");
+            fprintf(f_out,"###########\n");
         }
         limpaStruct(Mat);
       }

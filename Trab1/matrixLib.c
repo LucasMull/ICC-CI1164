@@ -328,30 +328,41 @@ float **geraIdentidade(unsigned int n) {
   \param timeLy tempo para calculo de Ly=I
   \param timeUx tempo para calculo de Ux=y
 */
-void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx) {
+void geraInversa(t_matrix *Mat, double *timeLy, double *timeUx) {
 	
+  double timeSum = 0.0f;
+
   // Calcula Ly=I
-	*timeLy = timestamp();
+	
   for (int k=0; k<Mat->n; ++k) 
   {
-		for (int i=0; i<Mat->n; ++i) {
-			Mat->Inv[i][k] = matId[k][i];
+		*timeLy = timestamp();
+    for (int i=0; i<Mat->n; ++i) {
+			Mat->Inv[i][k] = Mat->Id[k][i];
 			for (int j=i-1; j>=0; --j)
 				Mat->Inv[i][k] -= Mat->L[i][j] * Mat->Inv[j][k];
 			Mat->Inv[i][k] /= Mat->L[i][i];
 		}
-	}
-  *timeLy = timestamp() - *timeLy;
+	  *timeLy = timestamp() - *timeLy;
+    timeSum += *timeLy;
+  }
+  
+  *timeLy = timeSum/Mat->n;
+  timeSum = 0.0f;
 
   // Calcula Ux=y
-  *timeUx = timestamp();
+  
 	for (int k=0; k<Mat->n; ++k) 
   {
+    *timeUx = timestamp();
 		for (int i=Mat->n-1; i>=0; --i) {
 			for (int j=i+1; j<Mat->n; ++j)
 				Mat->Inv[i][k] -= Mat->U[i][j] * Mat->Inv[j][k];
 			Mat->Inv[i][k] /= Mat->U[i][i];
 		}
-	}
-  *timeUx = timestamp() - *timeUx;
+	  *timeUx = timestamp() - *timeUx;
+    timeSum += *timeUx;
+  }
+  
+  *timeUx = timeSum/Mat->n;
 }
