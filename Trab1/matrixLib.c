@@ -235,6 +235,22 @@ static void trocaLinha (float **Mat, unsigned int i, unsigned int j) {
 }
 
 /*!
+  \brief Calcula determinante a partir das matrizes L e U
+
+  \param L matriz L
+  \param U matriz U
+  \param n norma da matriz
+  \return determinante
+*/
+static float determinanteLU (float **L, float **U, unsigned int n) {
+
+    float det = U[0][0] * L[0][0];
+    for (int i=1; i < n; ++i)
+        det *= U[i][i] * L[i][i] * -1;
+    return det;
+}
+
+/*!
   \brief Triangulariza a matriz Mat->a de norma n
   \note separa Mat->a em L e U
 
@@ -293,8 +309,13 @@ int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal) {
 
     *tTotal = timestamp() - *tTotal;
 
-    /// @todo Mat->U é alocado em alocaStruct, é preciso copiar conteúdo de 'copia' para Mat->U, ou então não alocar memória para Mat->U
     Mat->U = copia;
+
+    // checar se matriz é inversível
+    if (0.0f == determinanteLU(Mat->L, Mat->U, Mat->n)) {
+      fprintf(stderr, "Erro Triangularizacao: Matriz não é inversível, Det = 0\n");
+      return -1;
+    }
 
     return 0;
 }

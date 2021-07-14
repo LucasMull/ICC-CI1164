@@ -7,6 +7,8 @@ OBJS = matrixLib.o utils.o
 
 .PHONY: limpa faxina clean purge all
 
+all: $(PROG)
+
 %.o: %.c matrixLib.h
 	$(CC) -c $(CFLAGS) $<
 
