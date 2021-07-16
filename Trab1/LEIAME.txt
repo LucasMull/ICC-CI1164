@@ -60,6 +60,14 @@ DESCRIÇÃO
     Imprime a matriz nxn fornecida na saída padrão (stdout).
 
 NOME
+    static float determinanteU (float **U, unsigned int n);
+DESCRIÇÃO
+    Calcula a determinante da matriz já triangularizada,
+    multiplicando os termos da diagonal principal de U.
+RETORNO
+    Determinante (Se != 0, quer dizer que a matriz original é inversível).
+
+NOME
     int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
 DESCRIÇÃO
     Efetua a triangularização de Mat->A e obtêm os campos Mat->L e 
