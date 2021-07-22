@@ -188,6 +188,38 @@ void multMatRowVet (MatRow mat, Vetor v, int m, int n, Vetor res)
   }
 }
 
+/**
+ *  Funcao multMatRowVet_otimiz:  Efetua multiplicacao entre matriz 'mxn' por vetor
+ *                       de 'n' elementos
+ *  @param mat matriz 'row x col'
+ *  @param row número de linhas da matriz
+ *  @param col número de colunas da matriz
+ *  @param res vetor que guarda o resultado. Deve estar previamente alocado e com
+ *             seus elementos inicializados em 0.0 (zero)
+ *  @param m fator de unrolling
+ *  @return vetor de 'm' elementos
+ *
+ */
+
+void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, int m, Vetor res)
+{
+  if (!res) return;
+    
+  /* Efetua a multiplicação */
+  for (int i=0; i < row - (row % m); i += m) {
+    for (int j=0; j < col; ++j) {
+      res[i] += mat[row*i + j] * v[j];
+      res[i+1] += mat[row*(i+1) + j] * v[j];
+      res[i+2] += mat[row*(i+2) + j] * v[j];
+      res[i+m-1] += mat[row*(i+m-1) + j] * v[j];
+    }
+  }
+
+  for (int i = row - (row % m); i < row; ++i)
+    for (int j=0; j < col; ++j)
+      res[i] += mat[row*i + j] * v[j];
+}
+
 
 /**
  *  Funcao multMatMatPtr: Efetua multiplicacao de duas matrizes 'n x n' 
