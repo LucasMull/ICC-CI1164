@@ -204,6 +204,9 @@ void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, Vetor res)
 {
   if (!res) return;
     
+  // Foi implementado o metodo de otimização Unroll and Jamming
+  // Fator de unroll = 8
+  
   for (int i=0; i < row - (row % 8); i += 8) {
     for (int j=0; j < col; ++j) {
       res[i] += mat[row*i + j] * v[j];
@@ -217,6 +220,7 @@ void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, Vetor res)
     }
   }
 
+  // Remainder loop
   for (int i = row - (row % 8); i < row; ++i)
     for (int j=0; j < col; ++j)
       res[i] += mat[row*i + j] * v[j];
@@ -280,6 +284,10 @@ void multMatMatRow_otimiz (MatRow A, MatRow B, int n, MatRow C)
   int istart, jstart, kstart;
   int iend, jend, kend;
 
+	
+  // Implementação do algoritmo de otimização loop blocking
+  // tamanho bloco = 32
+  // fator de unrolling = 8
   for (int ii=0; ii < n/b; ++ii) {
     istart=ii*b; iend=istart+b;
     for (int jj=0; jj < n/b; ++jj) {
@@ -304,7 +312,8 @@ void multMatMatRow_otimiz (MatRow A, MatRow B, int n, MatRow C)
       }
     }
   }
-
+	
+  // Remainder loop
   for (int i = n - (n % 8); i < n; ++i)
     for (int j=0; j < n; ++j)
       for (int k=0; k < n; ++k)

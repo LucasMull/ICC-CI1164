@@ -4,10 +4,6 @@ PRINT = imprimeTabela
 CC   = gcc -std=c11 -g
 OBJS = matriz.o
 
-ifeq ($(DEBUG),1)
-	CFLAGS = -DDEBUG
-endif
-
 CFLAGS += -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
 LFLAGS = -L${LIKWID_LIB} -llikwid -lm
 

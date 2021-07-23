@@ -1,0 +1,110 @@
+--------------------------------------------------------------------------------
+CPU name:	Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz
+CPU type:	Intel Coffeelake processor
+CPU clock:	3.41 GHz
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407998456 GHz,
+TABLE,Region MatRowVetOtimiz,Group 1 Raw,L3,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.013112,
+call count,1,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,112526700
+CPU_CLK_UNHALTED_CORE,FIXC1,49232210
+CPU_CLK_UNHALTED_REF,FIXC2,44263670
+L2_LINES_IN_ALL,PMC0,3567705
+L2_TRANS_L2_WB,PMC1,2989442
+TABLE,Region MatRowVetOtimiz,Group 1 Metric,L3,10
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0131,
+Runtime unhalted [s],0.0144,
+Clock [MHz],3790.5419,
+CPI,0.4375,
+L3 load bandwidth [MBytes/s],17413.9511,
+L3 load data volume [GBytes],0.2283,
+L3 evict bandwidth [MBytes/s],14591.4522,
+L3 evict data volume [GBytes],0.1913,
+L3 bandwidth [MBytes/s],32005.4033,
+L3 data volume [GBytes],0.4197,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407998456 GHz,
+TABLE,Region MatRowVet,Group 1 Raw,L3,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.027617,
+call count,1,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,175038800
+CPU_CLK_UNHALTED_CORE,FIXC1,103591500
+CPU_CLK_UNHALTED_REF,FIXC2,93158530
+L2_LINES_IN_ALL,PMC0,3143234
+L2_TRANS_L2_WB,PMC1,3082459
+TABLE,Region MatRowVet,Group 1 Metric,L3,10
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0276,
+Runtime unhalted [s],0.0304,
+Clock [MHz],3789.6656,
+CPI,0.5918,
+L3 load bandwidth [MBytes/s],7284.1324,
+L3 load data volume [GBytes],0.2012,
+L3 evict bandwidth [MBytes/s],7143.2923,
+L3 evict data volume [GBytes],0.1973,
+L3 bandwidth [MBytes/s],14427.4247,
+L3 data volume [GBytes],0.3984,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407998456 GHz,
+TABLE,Region MatMatRowOtimiz,Group 1 Raw,L3,5
+Region Info,Core 3,
+RDTSC Runtime [s],49.805720,
+call count,1,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,569922100000
+CPU_CLK_UNHALTED_CORE,FIXC1,187946800000
+CPU_CLK_UNHALTED_REF,FIXC2,168989100000
+L2_LINES_IN_ALL,PMC0,1782812000
+L2_TRANS_L2_WB,PMC1,103237800
+TABLE,Region MatMatRowOtimiz,Group 1 Metric,L3,10
+Metric,Core 3,
+Runtime (RDTSC) [s],49.8057,
+Runtime unhalted [s],55.1487,
+Clock [MHz],3790.3179,
+CPI,0.3298,
+L3 load bandwidth [MBytes/s],2290.9009,
+L3 load data volume [GBytes],114.1000,
+L3 evict bandwidth [MBytes/s],132.6598,
+L3 evict data volume [GBytes],6.6072,
+L3 bandwidth [MBytes/s],2423.5607,
+L3 data volume [GBytes],120.7072,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407998456 GHz,
+TABLE,Region MatMatRow,Group 1 Raw,L3,5
+Region Info,Core 3,
+RDTSC Runtime [s],757.420100,
+call count,1,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,1000200000000
+CPU_CLK_UNHALTED_CORE,FIXC1,2858070000000
+CPU_CLK_UNHALTED_REF,FIXC2,2569743000000
+L2_LINES_IN_ALL,PMC0,398174900000
+L2_TRANS_L2_WB,PMC1,23090700000
+TABLE,Region MatMatRow,Group 1 Metric,L3,10
+Metric,Core 3,
+Runtime (RDTSC) [s],757.4201,
+Runtime unhalted [s],838.6359,
+Clock [MHz],3790.3783,
+CPI,2.8575,
+L3 load bandwidth [MBytes/s],33644.7285,
+L3 load data volume [GBytes],25483.1936,
+L3 evict bandwidth [MBytes/s],1951.1032,
+L3 evict data volume [GBytes],1477.8048,
+L3 bandwidth [MBytes/s],35595.8317,
+L3 data volume [GBytes],26960.9984,

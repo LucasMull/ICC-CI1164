@@ -4,11 +4,7 @@
 #include <getopt.h>    /* getopt */
 #include <unistd.h>    /* stdconf */
 
-#ifndef DEBUG
 # include <likwid.h>    /* LIKWID */
-#endif // DEBUG
-
-
 #include "matriz.h"
 
 /**
@@ -70,7 +66,6 @@ int main (int argc, char *argv[])
 
   vet = geraVetor (n, 0);
     
-#ifndef DEBUG
   LIKWID_MARKER_INIT;
   
   LIKWID_MARKER_START("MatRowVetOtimiz");
@@ -85,33 +80,38 @@ int main (int argc, char *argv[])
 
   LIKWID_MARKER_STOP("MatRowVet");
 
+  LIKWID_MARKER_START("MatMatRowOtimiz");
+
+  multMatMatRow_otimiz (mRow_1, mRow_2, n, resMatRow);
+  
+  LIKWID_MARKER_STOP("MatMatRowOtimiz");
+
+  LIKWID_MARKER_START("MatMatRow");
+
+  multMatMatRow (mRow_1, mRow_2, n, resMatRow);
+  
+  LIKWID_MARKER_STOP("MatMatRow");
+
   LIKWID_MARKER_CLOSE;
-#else // modo DEBUG
+
 #if 0
     prnMatPtr (mPtr_1, n, n);
     prnMatPtr (mPtr_2, n, n);
-#endif
     prnMatRow (mRow_1, n, n);
     prnMatRow (mRow_2, n, n);
-#if 0
     prnVetor (vet, n);
-#endif
     printf ("=================================\n\n");
 
-#if 1
     multMatMatRow_otimiz (mRow_1, mRow_2, n, resMatRow);
-#else
-    multMatMatRow (mRow_1, mRow_2, n, resMatRow);
-#endif
 
-#if 0
+    multMatMatRow (mRow_1, mRow_2, n, resMatRow);
+
     prnVetor (resPtr, n);
     prnVetor (resRow, n);
-#endif
+
     prnMatRow (resMatRow, n, n);
-#if 0
     prnMatPtr (resMatPtr, n, n);
-#endif
+
 #endif // DEBUG
 
 #if 0

@@ -7,92 +7,92 @@ CPU clock:	3.41 GHz
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.40798696 GHz,
-TABLE,Region MatPtrVet,Group 1 Raw,L2CACHE,5
+CPU clock:,3.407961752 GHz,
+TABLE,Region MatRowVetOtimiz,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000010,
+RDTSC Runtime [s],0.000009,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,74266
-CPU_CLK_UNHALTED_CORE,FIXC1,48656
-CPU_CLK_UNHALTED_REF,FIXC2,44020
-L2_TRANS_ALL_REQUESTS,PMC0,7165
-L2_RQSTS_MISS,PMC1,2427
-TABLE,Region MatPtrVet,Group 1 Metric,L2CACHE,7
+INSTR_RETIRED_ANY,FIXC0,50101
+CPU_CLK_UNHALTED_CORE,FIXC1,43299
+CPU_CLK_UNHALTED_REF,FIXC2,38908
+L2_TRANS_ALL_REQUESTS,PMC0,7720
+L2_RQSTS_MISS,PMC1,2385
+TABLE,Region MatRowVetOtimiz,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],1.002765e-05,
-Runtime unhalted [s],1.427705e-05,
-Clock [MHz],3766.9017,
-CPI,0.6552,
-L2 request rate,0.0965,
-L2 miss rate,0.0327,
-L2 miss ratio,0.3387,
+Runtime (RDTSC) [s],8.575128e-06,
+Runtime unhalted [s],1.270525e-05,
+Clock [MHz],3792.5706,
+CPI,0.8642,
+L2 request rate,0.1541,
+L2 miss rate,0.0476,
+L2 miss ratio,0.3089,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.40798696 GHz,
+CPU clock:,3.407961752 GHz,
 TABLE,Region MatRowVet,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000012,
+RDTSC Runtime [s],0.000009,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,74174
-CPU_CLK_UNHALTED_CORE,FIXC1,48873
-CPU_CLK_UNHALTED_REF,FIXC2,43594
-L2_TRANS_ALL_REQUESTS,PMC0,6865
-L2_RQSTS_MISS,PMC1,2217
+INSTR_RETIRED_ANY,FIXC0,74371
+CPU_CLK_UNHALTED_CORE,FIXC1,45251
+CPU_CLK_UNHALTED_REF,FIXC2,40612
+L2_TRANS_ALL_REQUESTS,PMC0,5767
+L2_RQSTS_MISS,PMC1,1702
 TABLE,Region MatRowVet,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],1.151475e-05,
-Runtime unhalted [s],1.434072e-05,
-Clock [MHz],3820.6759,
-CPI,0.6589,
-L2 request rate,0.0926,
-L2 miss rate,0.0299,
-L2 miss ratio,0.3229,
+Runtime (RDTSC) [s],9.396138e-06,
+Runtime unhalted [s],1.327802e-05,
+Clock [MHz],3797.2441,
+CPI,0.6084,
+L2 request rate,0.0775,
+L2 miss rate,0.0229,
+L2 miss ratio,0.2951,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.40798696 GHz,
-TABLE,Region MatMatPtr,Group 1 Raw,L2CACHE,5
+CPU clock:,3.407961752 GHz,
+TABLE,Region MatMatRowOtimiz,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000978,
+RDTSC Runtime [s],0.000397,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,8084206
-CPU_CLK_UNHALTED_CORE,FIXC1,3674815
-CPU_CLK_UNHALTED_REF,FIXC2,3302920
-L2_TRANS_ALL_REQUESTS,PMC0,201024
-L2_RQSTS_MISS,PMC1,6311
-TABLE,Region MatMatPtr,Group 1 Metric,L2CACHE,7
+INSTR_RETIRED_ANY,FIXC0,4379848
+CPU_CLK_UNHALTED_CORE,FIXC1,1476393
+CPU_CLK_UNHALTED_REF,FIXC2,1326848
+L2_TRANS_ALL_REQUESTS,PMC0,48766
+L2_RQSTS_MISS,PMC1,5560
+TABLE,Region MatMatRowOtimiz,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],0.0010,
-Runtime unhalted [s],0.0011,
-Clock [MHz],3791.7121,
-CPI,0.4546,
-L2 request rate,0.0249,
-L2 miss rate,0.0008,
-L2 miss ratio,0.0314,
+Runtime (RDTSC) [s],0.0004,
+Runtime unhalted [s],0.0004,
+Clock [MHz],3792.0627,
+CPI,0.3371,
+L2 request rate,0.0111,
+L2 miss rate,0.0013,
+L2 miss ratio,0.1140,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.40798696 GHz,
+CPU clock:,3.407961752 GHz,
 TABLE,Region MatMatRow,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000915,
+RDTSC Runtime [s],0.000943,
 call count,1,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,8084594
-CPU_CLK_UNHALTED_CORE,FIXC1,3438516
-CPU_CLK_UNHALTED_REF,FIXC2,3091198
-L2_TRANS_ALL_REQUESTS,PMC0,189161
-L2_RQSTS_MISS,PMC1,5877
+INSTR_RETIRED_ANY,FIXC0,8084383
+CPU_CLK_UNHALTED_CORE,FIXC1,3586237
+CPU_CLK_UNHALTED_REF,FIXC2,3223968
+L2_TRANS_ALL_REQUESTS,PMC0,236611
+L2_RQSTS_MISS,PMC1,5571
 TABLE,Region MatMatRow,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
 Runtime (RDTSC) [s],0.0009,
-Runtime unhalted [s],0.0010,
-Clock [MHz],3790.8984,
-CPI,0.4253,
-L2 request rate,0.0234,
+Runtime unhalted [s],0.0011,
+Clock [MHz],3790.9057,
+CPI,0.4436,
+L2 request rate,0.0293,
 L2 miss rate,0.0007,
-L2 miss ratio,0.0311,
+L2 miss ratio,0.0235,

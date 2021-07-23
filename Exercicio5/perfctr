@@ -16,7 +16,7 @@ echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 
 make
 
-for SIZE in 64 100 128 2000 2048
+for SIZE in 3000 4096 5000
 do
 	${LIKWID_CMD} ./matmult -n $SIZE > ./Resultados/$1_$SIZE.txt
 done
