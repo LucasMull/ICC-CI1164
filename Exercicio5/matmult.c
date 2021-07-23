@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
   
   LIKWID_MARKER_START("MatRowVetOtimiz");
 
-  multMatRowVet_otimiz (mRow_1, vet, n, n, 4, resRow);
+  multMatRowVet_otimiz (mRow_1, vet, n, n, 8, resRow);
 
   LIKWID_MARKER_STOP("MatRowVetOtimiz");
  

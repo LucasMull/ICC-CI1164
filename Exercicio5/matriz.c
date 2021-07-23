@@ -211,6 +211,10 @@ void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, int m, Vetor r
       res[i] += mat[row*i + j] * v[j];
       res[i+1] += mat[row*(i+1) + j] * v[j];
       res[i+2] += mat[row*(i+2) + j] * v[j];
+      res[i+3] += mat[row*(i+3) + j] * v[j];
+      res[i+4] += mat[row*(i+4) + j] * v[j];
+      res[i+5] += mat[row*(i+5) + j] * v[j];
+      res[i+6] += mat[row*(i+6) + j] * v[j];
       res[i+m-1] += mat[row*(i+m-1) + j] * v[j];
     }
   }
