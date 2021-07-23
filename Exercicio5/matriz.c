@@ -189,24 +189,22 @@ void multMatRowVet (MatRow mat, Vetor v, int m, int n, Vetor res)
 }
 
 /**
- *  Funcao multMatRowVet_otimiz:  Efetua multiplicacao entre matriz 'mxn' por vetor
- *                       de 'n' elementos
+ *  Funcao multMatRowVet_otimiz:  Efetua multiplicacao entre matriz 'row x col' por vetor
+ *                       de 'col' elementos
  *  @param mat matriz 'row x col'
  *  @param row número de linhas da matriz
  *  @param col número de colunas da matriz
  *  @param res vetor que guarda o resultado. Deve estar previamente alocado e com
  *             seus elementos inicializados em 0.0 (zero)
- *  @param m fator de unrolling
- *  @return vetor de 'm' elementos
+ *  @return vetor de 'row' elementos
  *
  */
 
-void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, int m, Vetor res)
+void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, Vetor res)
 {
   if (!res) return;
     
-  /* Efetua a multiplicação */
-  for (int i=0; i < row - (row % m); i += m) {
+  for (int i=0; i < row - (row % 8); i += 8) {
     for (int j=0; j < col; ++j) {
       res[i] += mat[row*i + j] * v[j];
       res[i+1] += mat[row*(i+1) + j] * v[j];
@@ -215,11 +213,11 @@ void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, int m, Vetor r
       res[i+4] += mat[row*(i+4) + j] * v[j];
       res[i+5] += mat[row*(i+5) + j] * v[j];
       res[i+6] += mat[row*(i+6) + j] * v[j];
-      res[i+m-1] += mat[row*(i+m-1) + j] * v[j];
+      res[i+7] += mat[row*(i+7) + j] * v[j];
     }
   }
 
-  for (int i = row - (row % m); i < row; ++i)
+  for (int i = row - (row % 8); i < row; ++i)
     for (int j=0; j < col; ++j)
       res[i] += mat[row*i + j] * v[j];
 }
@@ -247,7 +245,7 @@ void multMatMatPtr (MatPtr A, MatPtr B, int n, MatPtr C)
 
 
 /**
- *  Funcao multMatMatPtr: Efetua multiplicacao de duas matrizes 'n x n' 
+ *  Funcao multMatMatRow: Efetua multiplicacao de duas matrizes 'n x n' 
  *  @param A matriz 'n x n'
  *  @param B matriz 'n x n'
  *  @param n ordem da matriz quadrada
@@ -266,6 +264,52 @@ void multMatMatRow (MatRow A, MatRow B, int n, MatRow C)
 	C[i*n+j] += A[i*n+k] * B[k*n+j];
 }
 
+/**
+ *  Funcao multMatMatRow_otimiz: Efetua multiplicacao de duas matrizes 'n x n' 
+ *  @param A matriz 'n x n'
+ *  @param B matriz 'n x n'
+ *  @param n ordem da matriz quadrada
+ *  @param C   matriz que guarda o resultado. Deve ser previamente gerada com 'geraMatPtr()'
+ *             e com seus elementos inicializados em 0.0 (zero)
+ *
+ */
+
+void multMatMatRow_otimiz (MatRow A, MatRow B, int n, MatRow C)
+{
+  const int b=32; // tam de bloco
+  int istart, jstart, kstart;
+  int iend, jend, kend;
+
+  for (int ii=0; ii < n/b; ++ii) {
+    istart=ii*b; iend=istart+b;
+    for (int jj=0; jj < n/b; ++jj) {
+      jstart=jj*b; jend=jstart+b;
+      for (int kk=0; kk < n/b; ++kk) {
+        kstart=kk*b; kend=kstart+b;
+        for (int i=istart; i < iend; ++i)
+          for (int j=jstart; j < jend; j+=8) {
+            C[i*n+j] = C[i*n+j+1] = C[i*n+j+2] = C[i*n+j+3] = \
+            C[i*n+j+4] = C[i*n+j+5] = C[i*n+j+6] = C[i*n+j+7] = 0.0;
+            for (int k=kstart; k<kend; ++k) {
+              C[i*n+j] += A[i*n+k] * B[k*n+j];
+              C[i*n+j+1] += A[i*n+k] * B[k*n+j+1];
+              C[i*n+j+2] += A[i*n+k] * B[k*n+j+2];
+              C[i*n+j+3] += A[i*n+k] * B[k*n+j+3];
+              C[i*n+j+4] += A[i*n+k] * B[k*n+j+4];
+              C[i*n+j+5] += A[i*n+k] * B[k*n+j+5];
+              C[i*n+j+6] += A[i*n+k] * B[k*n+j+6];
+              C[i*n+j+7] += A[i*n+k] * B[k*n+j+7];
+            }
+          }
+      }
+    }
+  }
+
+  for (int i = n - (n % 8); i < n; ++i)
+    for (int j=0; j < n; ++j)
+      for (int k=0; k < n; ++k)
+        C[i*n+j] += A[i*n+k] * B[k*n+j];
+}
 
 /**
  *  Funcao prnMatPtr:  Imprime o conteudo de uma matriz em stdout

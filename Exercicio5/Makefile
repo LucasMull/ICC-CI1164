@@ -1,10 +1,14 @@
-PROG   = matmult
+PROG  = matmult
 PRINT = imprimeTabela
 
-CC = gcc -std=c11 -g
+CC   = gcc -std=c11 -g
 OBJS = matriz.o
 
-CFLAGS = -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native -DDEBUG
+ifeq ($(DEBUG),1)
+	CFLAGS = -DDEBUG
+endif
+
+CFLAGS += -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
 LFLAGS = -L${LIKWID_LIB} -llikwid -lm
 
 .PHONY: all debug clean limpa purge faxina

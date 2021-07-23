@@ -4,7 +4,9 @@
 #include <getopt.h>    /* getopt */
 #include <unistd.h>    /* stdconf */
 
-#include <likwid.h>    /* LIKWID */
+#ifndef DEBUG
+# include <likwid.h>    /* LIKWID */
+#endif // DEBUG
 
 
 #include "matriz.h"
@@ -68,20 +70,12 @@ int main (int argc, char *argv[])
 
   vet = geraVetor (n, 0);
     
-#ifdef DEBUG
-    prnMatPtr (mPtr_1, n, n);
-    prnMatPtr (mPtr_2, n, n);
-    prnMatRow (mRow_1, n, n);
-    prnMatRow (mRow_2, n, n);
-    prnVetor (vet, n);
-    printf ("=================================\n\n");
-#endif /* DEBUG */
-
+#ifndef DEBUG
   LIKWID_MARKER_INIT;
   
   LIKWID_MARKER_START("MatRowVetOtimiz");
 
-  multMatRowVet_otimiz (mRow_1, vet, n, n, 8, resRow);
+  multMatRowVet_otimiz (mRow_1, vet, n, n, resRow);
 
   LIKWID_MARKER_STOP("MatRowVetOtimiz");
  
@@ -91,10 +85,40 @@ int main (int argc, char *argv[])
 
   LIKWID_MARKER_STOP("MatRowVet");
 
+  LIKWID_MARKER_CLOSE;
+#else // modo DEBUG
 #if 0
+    prnMatPtr (mPtr_1, n, n);
+    prnMatPtr (mPtr_2, n, n);
+#endif
+    prnMatRow (mRow_1, n, n);
+    prnMatRow (mRow_2, n, n);
+#if 0
+    prnVetor (vet, n);
+#endif
+    printf ("=================================\n\n");
+
+#if 1
+    multMatMatRow_otimiz (mRow_1, mRow_2, n, resMatRow);
+#else
+    multMatMatRow (mRow_1, mRow_2, n, resMatRow);
+#endif
+
+#if 0
+    prnVetor (resPtr, n);
+    prnVetor (resRow, n);
+#endif
+    prnMatRow (resMatRow, n, n);
+#if 0
+    prnMatPtr (resMatPtr, n, n);
+#endif
+#endif // DEBUG
+
+#if 0
+  LIKWID_MARKER_INIT;
+
   multMatRowVet (mRow_1, vet, n, n, resRow);
   
-
   LIKWID_MARKER_START("MatPtrVet");
   
   multMatPtrVet (mPtr_1, vet, n, n, resPtr);
@@ -114,17 +138,9 @@ int main (int argc, char *argv[])
   multMatMatRow (mRow_1, mRow_2, n, resMatRow);
 
   LIKWID_MARKER_STOP("MatMatRow");
-#endif   
-  LIKWID_MARKER_CLOSE;
 
-#ifdef DEBUG
-#if 0
-    prnVetor (resPtr, n);
-    prnVetor (resRow, n);
-    prnMatRow (resMatRow, n, n);
-    prnMatPtr (resMatPtr, n, n);
-#endif
-#endif /* DEBUG */
+  LIKWID_MARKER_CLOSE;
+#endif   
 
   liberaMatPtr (mPtr_1, n);
   liberaMatPtr (mPtr_2, n);

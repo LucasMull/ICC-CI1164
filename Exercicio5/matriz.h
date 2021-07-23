@@ -28,11 +28,12 @@ void multMatPtrVet (MatPtr mat, Vetor v, int m, int n, Vetor res);
 void prnMatPtr (MatPtr mat, int m, int n);
 
 void multMatRowVet (MatRow mat, Vetor v, int m, int n, Vetor res);
-void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, int m, Vetor res);
+void multMatRowVet_otimiz (MatRow mat, Vetor v, int row, int col, Vetor res);
 void prnMatRow (MatRow mat, int m, int n);
 
 void multMatMatPtr (MatPtr A, MatPtr B, int n, MatPtr C);
 void multMatMatRow (MatRow A, MatRow B, int n, MatRow C);
+void multMatMatRow_otimiz (MatRow A, MatRow B, int n, MatRow C);
 
 void prnVetor (Vetor vet, int n);
 
