@@ -5,10 +5,10 @@ EQUIPE
     Lucas Müller          | GRR20197160
 
 NOME
-    float** alocaMatrix(unsigned int n);
+    float* SL_alocaMatrix(unsigned int n);
 DESCRIÇÃO
-    A função alocaMatrix() faz uma alocação única de tamanho 
-    n*sizeof(float*) + n*n*sizeof(float). Esse design foi escolhido
+    A função SL_alocaMatrix() faz uma alocação única de tamanho 
+    n*n*sizeof(float). Esse design foi escolhido
     pois além de otimizar a localidade dos elementos em um único grande
     bloco de memória, também é menos suscetível a erros, uma vez que só
     requer um único free() para liberar memória.
@@ -17,74 +17,66 @@ RETORNO
     falha.
 
 NOME
-    t_matrix *alocaStruct(unsigned int n);
+    t_sist *SL_aloca(unsigned int n);
 DESCRIÇÃO
-    Aloca na memória uma struct t_matrix contendo os seguintes campos :
-        - mat->A :
+    Aloca na memória uma struct t_sist contendo os seguintes campos :
+        - SL->A :
             A matriz original de norma n.
-        - mat->Inv :
-            Espaço para a inversa da matriz, obtida em geraInversa().
-        - mat->L e mat->U :
+        - SL->Inv :
+            Espaço para a inversa da matriz, obtida em SL_geraInversa().
+        - SL->L e SL->U :
             Espaço para a matriz L(lower) e U(upper), obtidas em
-            triangularizaMatrix().
+            SL_triangulariza().
 RETORNO
-    Uma struct t_matrix de norma nxn, ou NULL se houve falha.
+    Uma struct t_sist de norma nxn, ou NULL se houve falha.
 
 NOME
-    void limpaStruct(t_matrix *Mat);
+    void SL_libera(t_sist *SL);
 DESCRIÇÃO
-    Liberação da memória alocada por alocaStruct().
+    Liberação da memória alocada por SL_aloca().
 
 NOME
-    float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col);
+    float SL_normaL2Residuo(t_sist *SL, float *matId, unsigned int col);
 DESCRIÇÃO
     É calculada a deviância entre a matriz identidade resultante 
     do produto da matriz original com a inversa obtida por 
-    geraInversa(), com a a da matriz identidade esperada.
+    SL_geraInversa(), com a a da matriz identidade esperada.
 RETORNO
     Valor do tipo float contendo a norma L2 do residuo.
 
 NOME
-    t_matrix *readMatrix();
+    t_sist *SL_leitura();
 DESCRIÇÃO
     Efetua leitura da matriz pela entrada padrão (stdin), retorna
     imediatamente após completar a primeira matriz, chamadas
     consecutivas devem ser feitas para conseguir qualquer matriz
     sequêncial.
 RETORNO
-    Um ponteiro para t_matriz contendo a matriz obtida nessa interação
+    Um ponteiro para t_sist contendo a matriz obtida nessa interação
 
 NOME
-    void printMatrix(FILE *f_out, float **matrix, int n);
+    void SL_printMatrix(FILE *f_out, float **matrix, int n);
 DESCRIÇÃO
     Imprime a matriz nxn fornecida na saída padrão (stdout).
 
 NOME
-    static float determinanteU (float **U, unsigned int n);
+    int SL_triangulariza(t_sist *SL, int pivotP, double *tTotal);
 DESCRIÇÃO
-    Calcula a determinante da matriz já triangularizada,
-    multiplicando os termos da diagonal principal de U.
-RETORNO
-    Determinante (Se != 0, quer dizer que a matriz original é inversível).
-
-NOME
-    int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
-DESCRIÇÃO
-    Efetua a triangularização de Mat->A e obtêm os campos Mat->L e 
-    Mat->U, que serão utilizados para calcular a inversa em
-    geraInversa().
+    Efetua a triangularização de SL->A e obtêm os campos SL->L e 
+    SL->U, que serão utilizados para calcular a inversa em
+    SL_geraInversa().
 RETORNO
     0 se sucesso e -1 em caso de falha.
 
 NOME
-    float **geraIdentidade(unsigned int n);
+    float **SL_geraIdentidade(unsigned int n);
 DESCRIÇÃO
     Gera a matriz identidade de norma n.
 RETORNO
     A matriz identidade de norma n, ou NULL em caso de falha.
 
 NOME
-    void geraInversa(t_matrix *Mat, float **matId, double *timeLy, double *timeUx);
+    void geraInversa(t_sist *SL, float **matId, double *timeLy, double *timeUx);
 DESCRIÇÃO
-    Gera a inversa da matriz original, apontada por Mat->A, a partir
-    dos valores Mat->L e Mat->U encontrados em triangularizaMatrix().
+    Gera a inversa da matriz original, apontada por SL->A, a partir
+    dos valores SL->L e SL->U encontrados em SL_triangulariza().

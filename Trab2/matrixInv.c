@@ -12,7 +12,7 @@
 
 int main (int argc, char **argv) {
 
-    t_matrix *Mat;
+    t_sist *SL;
     double tempoTri, tempoUx, tempoLy;
     char opt;
     FILE *f_out = stdout;
@@ -38,32 +38,32 @@ int main (int argc, char **argv) {
 
     while (!feof(stdin))
     {
-      Mat = readMatrix();
-      if (Mat) {
-        fprintf(f_out,"\nN = %d",Mat->n);
+      SL = SL_leitura();
+      if (SL) {
+        fprintf(f_out,"\nN = %d",SL->n);
         fprintf(f_out,"\n");
         
         fprintf(f_out,"%.20s\n", "Original ##################");
-        printMatrix(f_out,Mat->A,Mat->n);
+        SL_printMatrix(f_out, SL->A, SL->n);
         
-        Mat->Id = geraIdentidade(Mat->n);
-        if (triangularizaMatrix(Mat,pivotP,&tempoTri) != -1) {
+        SL->Id = SL_geraIdentidade(SL->n);
+        if (SL_triangulariza(SL, pivotP, &tempoTri) != -1) {
 
-            geraInversa(Mat,&tempoLy,&tempoUx);
+            SL_geraInversa(SL,&tempoLy,&tempoUx);
             fprintf(f_out,"%.20s\n", "Inversa ##################");
-            printMatrix(f_out,Mat->Inv,Mat->n);
+            SL_printMatrix(f_out,SL->Inv,SL->n);
 
             fprintf(f_out,"###########\n");
             fprintf(f_out,"# Tempo Triangularizacao: %e ms\n",tempoTri);
             fprintf(f_out,"# Tempo calculo de Y: %e ms\n",tempoLy);
             fprintf(f_out,"# Tempo calculo de X: %e ms\n",tempoUx);
-            for (unsigned int i=0; i<Mat->n; ++i) {
-                fprintf(f_out,"# Norma L2 dos residuos (%d): ", i);
-                fprintf(f_out,"%g\n",normaL2Residuo(Mat,Mat->Id[i],i));
+            for (unsigned int i=0; i<SL->n; ++i) {
+                fprintf(f_out, "# Norma L2 dos residuos (%d): ", i);
+                fprintf(f_out, "%g\n",SL_normaL2Residuo(SL, &SL->Id[SL->n*i], i));
             }
-            fprintf(f_out,"###########\n");
+            fprintf(f_out, "###########\n");
         }
-        limpaStruct(Mat);
+        SL_libera(SL);
       }
     }
 

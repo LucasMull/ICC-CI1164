@@ -8,24 +8,21 @@
 
 typedef struct {
     unsigned int n;
-    float **A;
-    float **Inv;
-    float **Id;
-#if 0
+    float *A, *Inv, *Id;
     float *L, *U;
-#endif
-    float **L, **U;
-} t_matrix;
+} t_sist;
 
 
-float** alocaMatrix(unsigned int n);
-t_matrix *alocaStruct(unsigned int n);
-void limpaStruct(t_matrix *Mat);
-float normaL2Residuo(t_matrix *Mat, float *matId, unsigned int col);
-t_matrix *readMatrix();
-void printMatrix(FILE *f_out, float **matrix, int n);
-int triangularizaMatrix(t_matrix *Mat, int pivotP, double *tTotal);
-float **geraIdentidade(unsigned int n);
-void geraInversa(t_matrix *Mat, double *timeLy, double *timeUx);
+float* SL_alocaMatrix(unsigned int n);
+void SL_printMatrix(FILE *f_out, float *matrix, int n);
+
+t_sist *SL_aloca(unsigned int n);
+void SL_libera(t_sist *SL);
+t_sist *SL_leitura();
+
+float SL_normaL2Residuo(t_sist *SL, float *matId, unsigned int col);
+int SL_triangulariza(t_sist *SL, int pivotP, double *tTotal);
+float *SL_geraIdentidade(unsigned int n);
+void SL_geraInversa(t_sist *SL, double *timeLy, double *timeUx);
 
 #endif // __MATRIXLIB__
