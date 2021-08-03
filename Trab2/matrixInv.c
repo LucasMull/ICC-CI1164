@@ -36,35 +36,24 @@ int main (int argc, char **argv) {
         }
     }
 
+    float *vet;
     while (!feof(stdin))
     {
       SL = SL_leitura();
-      if (SL) {
-        fprintf(f_out,"\nN = %d",SL->n);
-        fprintf(f_out,"\n");
-        
-        fprintf(f_out,"%.20s\n", "Original ##################");
-        SL_printMatrix(f_out, SL->A, SL->n);
-        
-        SL->Id = SL_geraIdentidade(SL->n);
-        if (SL_triangulariza(SL, pivotP, &tempoTri) != -1) {
+      if (!SL) return EXIT_FAILURE;
 
-            SL_geraInversa(SL,&tempoLy,&tempoUx);
-            fprintf(f_out,"%.20s\n", "Inversa ##################");
-            SL_printMatrix(f_out,SL->Inv,SL->n);
+      vet = SL_interpolacao(SL, 0);
+      if (!vet) return EXIT_FAILURE;
 
-            fprintf(f_out,"###########\n");
-            fprintf(f_out,"# Tempo Triangularizacao: %e ms\n",tempoTri);
-            fprintf(f_out,"# Tempo calculo de Y: %e ms\n",tempoLy);
-            fprintf(f_out,"# Tempo calculo de X: %e ms\n",tempoUx);
-            for (unsigned int i=0; i<SL->n; ++i) {
-                fprintf(f_out, "# Norma L2 dos residuos (%d): ", i);
-                fprintf(f_out, "%g\n",SL_normaL2Residuo(SL, &SL->Id[SL->n*i], i));
-            }
-            fprintf(f_out, "###########\n");
-        }
-        SL_libera(SL);
-      }
+      SL_printMatrix(f_out, vet, SL->n, 1);
+#if 0
+      SL_printMatrix(f_out, SL->Int, SL->n, SL->n);
+      SL_printMatrix(f_out, SL->L, SL->n, SL->n);
+      SL_printMatrix(f_out, SL->U, SL->n, SL->n);
+      SL_printMatrix(f_out, SL->A, SL->n, SL->m);
+#endif
+      SL_libera(SL);
+      free(vet);
     }
 
     if (f_out != stdout) fclose(f_out);

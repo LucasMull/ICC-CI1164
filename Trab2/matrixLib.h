@@ -7,22 +7,21 @@
 #define __MATRIXLIB__
 
 typedef struct {
-    unsigned int n;
-    float *A, *Inv, *Id;
+    unsigned int n, m;
+    float *A, *Int;
     float *L, *U;
+    float *x;
 } t_sist;
 
 
-float* SL_alocaMatrix(unsigned int n);
-void SL_printMatrix(FILE *f_out, float *matrix, int n);
+float* SL_alocaMatrix(unsigned int n, unsigned int m);
+void SL_printMatrix(FILE *f_out, float *matrix, unsigned int n, unsigned int m);
 
-t_sist *SL_aloca(unsigned int n);
+t_sist *SL_aloca(unsigned int n, unsigned int m);
 void SL_libera(t_sist *SL);
 t_sist *SL_leitura();
 
-float SL_normaL2Residuo(t_sist *SL, float *matId, unsigned int col);
-int SL_triangulariza(t_sist *SL, int pivotP, double *tTotal);
-float *SL_geraIdentidade(unsigned int n);
-void SL_geraInversa(t_sist *SL, double *timeLy, double *timeUx);
+float *SL_interpolacao(t_sist *SL, unsigned int row);
+int SL_triangulariza(t_sist *SL, double *tTotal);
 
 #endif // __MATRIXLIB__

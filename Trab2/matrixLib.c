@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // memcpy()
 #include <math.h>
 
 #include "utils.h"
@@ -13,13 +14,14 @@
 /*!
   \brief Aloca matriz
 
-  \param n tamanho da matriz
+  \param n número de valores tabelados
+  \param m número de funções tabeladas
 
   \return ponteiro para matriz. NULL se houve erro de alocação
 */
-float* SL_alocaMatrix(unsigned int n) {
+float* SL_alocaMatrix(unsigned int n, unsigned int m) {
 
-  float *newMatrix = calloc(1, n*n*sizeof(float));
+  float *newMatrix = calloc(1, n*m*sizeof(float));
   if (!newMatrix) {
     perror("Falha ao alocar matriz\n");
     return NULL;
@@ -36,7 +38,7 @@ float* SL_alocaMatrix(unsigned int n) {
 */
 static float* copiaA(t_sist *SL) {
 
-	float *copia = SL_alocaMatrix(SL->n);
+	float *copia = SL_alocaMatrix(SL->n, SL->m);
 	if (!copia) return NULL;
 
 	for (unsigned int i=0; i<SL->n; ++i)
@@ -53,26 +55,27 @@ static float* copiaA(t_sist *SL) {
 
   \return ponteiro para t_sist. NULL se houve erro de alocação
 */
-t_sist *SL_aloca(unsigned int n) {
+t_sist *SL_aloca(unsigned int n, unsigned int m) {
 
 	t_sist *newSL = malloc(sizeof(t_sist));
 	if (!newSL) return NULL;
 
-	newSL->A = SL_alocaMatrix(n);
+	newSL->A = SL_alocaMatrix(n, m);
 	if (!newSL->A) {
     free(newSL);
     return NULL;
   }
-	newSL->Inv = SL_alocaMatrix(n);
-	if (!newSL->Inv) {
+
+	newSL->L = SL_alocaMatrix(n, n);
+	if (!newSL->L) {
     free(newSL->A);
     free(newSL);
     return NULL;
   }
 
-	newSL->L = SL_alocaMatrix(n);
-	if (!newSL->L) {
-    free(newSL->Inv);
+  newSL->x = calloc(1, n * sizeof(float));
+  if (!newSL->x) {
+    free(newSL->L);
     free(newSL->A);
     free(newSL);
     return NULL;
@@ -89,35 +92,13 @@ t_sist *SL_aloca(unsigned int n) {
 void SL_libera(t_sist *SL) {
 
   free(SL->A);
-  free(SL->Inv);
-  free(SL->Id);
   free(SL->L);
-  free(SL->U);
+  if (SL->U)
+    free(SL->U);
+  if (SL->Int)
+    free(SL->Int);
+  free(SL->x);
   free(SL);
-}
-
-/*!
-  \brief Essa função calcula a norma L2 do resíduo de uma matriz 
-
-  \param SL ponteiro para o sistema linear
-  \param matId ponteiro para a matriz identidade
-  \param col Coluna de matInv a ser multiplicada
-
-  \return Norma L2 do resíduo.
-*/
-float SL_normaL2Residuo(t_sist *SL, float *matId, unsigned int col) {
-
-  float sum = 0.0f;
-  float res;
-    
-    for (unsigned int i=0; i<SL->n; ++i) {
-        res = 0.0f;
-        for (int j=0; j<SL->n; ++j)
-            res += SL->A[SL->n*i+j] * SL->Inv[SL->n*j+col];
-        res = matId[i] - res;
-        sum += res*res;
-    }
-    return (sqrtf(sum));
 }
 
 /*!
@@ -134,26 +115,44 @@ t_sist *SL_leitura() {
         perror("Falha de leitura");
         return NULL;
     }
-    unsigned int n = strtoul(ln, NULL, 10);
-    if (!n) {
-        fputs("Não foi possível obter ordem de matriz\n", stderr);
+
+    unsigned int n=0, m=0;
+    sscanf(ln, "%d %d", &n, &m);
+    if (!n || !m) {
+        perror("Não foi possível obter ordem de matriz");
         return NULL;
     }
 
     // realiza alocação do Sistema Linear
-    t_sist *newSL = SL_aloca(n);
+    t_sist *newSL = SL_aloca(n, m);
     if (!newSL) {
         fputs("Não foi possível alocar 'newSL'\n", stderr);
         return NULL;
     }
     newSL->n = n;
+    newSL->m = m;
+
+    char *valorAtual, *valorProx;
+    if (!fgets(ln, sizeof(ln), stdin)) {
+        perror("#1 Falha de leitura");
+        return NULL;
+    }
+    valorAtual = ln;
+
+    for (unsigned int i=0; i < newSL->n; ++i) {
+      newSL->x[i] = strtof(valorAtual, &valorProx);
+      if (!valorProx) {
+          fputs("Não foi possível obter o próximo valor\n", stderr);
+          return NULL;
+      }
+      valorAtual = valorProx;
+    }
 
     // extrai as linhas contendo os elementos da matriz
-    char *valorAtual, *valorProx;
-    for (unsigned int i=0; i < newSL->n; ++i) {
+    for (unsigned int i=0; i < newSL->m; ++i) {
         valorAtual = ln;
         if (!fgets(ln, sizeof(ln), stdin)) {
-            perror("Falha de leitura");
+            perror("#2 Falha de leitura");
             return NULL;
         }
 
@@ -177,12 +176,13 @@ t_sist *SL_leitura() {
   \brief Imprime matriz
 
   \param matrix matriz a ser impressa
-  \param n tamanho da matriz
+  \param n número de valores tabelados
+  \param m número de funções tabeladas
 */
-void SL_printMatrix(FILE *f_out, float *matrix, int n) {
+void SL_printMatrix(FILE *f_out, float *matrix, unsigned int n, unsigned int m) {
 
 	fprintf(f_out,"\n");
-  for (unsigned int i=0; i<n; ++i) {
+  for (unsigned int i=0; i<m; ++i) {
 		for (unsigned int j=0; j<n; ++j)
 			fprintf(f_out,"%-10g ",matrix[n*i+j]);
 		fprintf(f_out,"\n");
@@ -190,24 +190,67 @@ void SL_printMatrix(FILE *f_out, float *matrix, int n) {
   fprintf(f_out,"\n");
 }
 
+float *SL_interpolacao(t_sist *SL, unsigned int row) {
+
+  float *mat = SL_alocaMatrix(SL->n, SL->n);
+  if (!mat) return NULL;
+
+  for (unsigned int i=0; i<SL->n; ++i)
+    for (unsigned int j=0; j<SL->n; ++j)
+      mat[SL->n*i+j] = powf(SL->x[i], (float)j);
+  SL->Int = mat;
+  SL_triangulariza(SL, &(double){0.0});
+
+  float *pol = SL_alocaMatrix(SL->n, 1); // polinomio
+  if (!pol) return NULL;
+
+  for (int i=0; i<SL->n; ++i) {
+    pol[i] = SL->A[SL->m*row+i];
+    for (int j=i-1; j>=0; --j)
+      pol[i] -= SL->L[SL->n*i+j] * pol[j];
+    pol[i] /= SL->L[SL->n*i+i];
+  }
+
+  for (int i=SL->n-1; i>=0; --i) {
+    for (int j=i+1; j<SL->n; ++j)
+      pol[i] -= SL->U[SL->n*i+j] * pol[j];
+    pol[i] /= SL->U[SL->n*i+i];
+  }
+
+  return pol;
+}
+
 /*!
   \brief Encontra o maior valor em uma coluna da matriz
 
   \param matrix a matriz
   \param n dimensao da matriz
-  \param i coluna
+  \param j coluna
   \return indice da coluna com max
 */
-static unsigned int maxValue (float *matrix, unsigned int n, unsigned int i) {
+static unsigned int maxValue (float *matrix, unsigned int n, unsigned int j) {
 
-    unsigned int max = i;
-    
-    for (int j=i+1; j<n; j++) {
-        if (fabs(matrix[n*j+i]) > fabs(matrix[max*j+i]))
-          max = j;
+    unsigned int max = j;
+    for (int i=max+1; i<n; i++) {
+        if (fabs(matrix[n*i+j]) > fabs(matrix[n*max+j]))
+          max = i;
     }
-    
     return max;
+}
+
+/*!
+  \brief Troca elementos
+
+  \param a elemento a
+  \param b elemento b
+*/
+static void trocaElemento (float *a, float *b)
+{
+  float aux;
+
+  aux = *a;
+  *a = *b;
+  *b = aux;
 }
 
 /*!
@@ -217,28 +260,19 @@ static unsigned int maxValue (float *matrix, unsigned int n, unsigned int i) {
   \param i linha a ser trocada com j
   \param j linha a ser trocada com i
 */
-static void trocaLinha (float *A, unsigned int i, unsigned int j) {
+static void trocaLinha (float *matrix, unsigned int i, unsigned int j, unsigned int n) {
 
-    float aux;
+    float *aux = malloc(n*sizeof(float));;
+    if(!aux) {
+      perror("Sem memória");
+      return;
+    }
 
-    aux = A[i];
-    A[i] = A[j];
-    A[j] = aux;
-}
+    memcpy(aux, &matrix[n*i], n*sizeof(float));
+    memcpy(&matrix[n*i], &matrix[n*j], n*sizeof(float));
+    memcpy(&matrix[n*j], aux, n*sizeof(float));
 
-/*!
-  \brief Calcula determinante a partir da U
-
-  \param U matriz U
-  \param n norma da matriz
-  \return determinante
-*/
-static float determinanteU (float *U, unsigned int n) {
-
-    float det = U[0];
-    for (int i=1; i < n; ++i)
-        det *= U[n*i+i];
-    return det;
+    free(aux);
 }
 
 /*!
@@ -246,13 +280,14 @@ static float determinanteU (float *U, unsigned int n) {
   \note separa SL->A em L e U
 
   \param SL o sistema linear a ser triangularizado
-  \param pivotP pivo parcial
   \param tTotal recebe tempo decorrido para cálculo
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza(t_sist *SL, int pivotP, double *tTotal) {
+int SL_triangulariza(t_sist *SL, double *tTotal) {
     
-    float *copia = copiaA(SL);
+    float *copia = malloc(SL->n * SL->n * sizeof(float));
+    memcpy(copia, SL->Int, SL->n * SL->n * sizeof(float));
+
     if (!copia) {
         perror("Erro Triangularizacao: falha ao copiar matriz");
         return -1;
@@ -260,121 +295,30 @@ int SL_triangulariza(t_sist *SL, int pivotP, double *tTotal) {
     
     *tTotal = timestamp();
     
-    if (pivotP) {
-      // Transforma a matriz em uma triangular com pivoteamento parcial
-      unsigned int pivo;
-      
-      for (int i=0; i<SL->n; i++) 
-      {
-          pivo = maxValue(copia,SL->n,i);
-          if (pivo != i) {
-              trocaLinha(copia,i,pivo);
-              trocaLinha(SL->A,i,pivo);
-              trocaLinha(SL->Id,i,pivo);
-              trocaLinha(SL->L,i,pivo);
-          }
+    // Transforma a matriz em uma triangular com pivoteamento parcial
+    unsigned int pivo;
+    for (int i=0; i<SL->n; i++) 
+    {
+        pivo = maxValue(copia,SL->n,i);
+        if (pivo != i) {
+            trocaElemento(&SL->A[SL->m*i+pivo-1], &SL->A[SL->m*i+i-1]);
+            trocaLinha(copia,i,pivo,SL->n);
+            trocaLinha(SL->Int,i,pivo,SL->n);
+            trocaLinha(SL->L,i,pivo,SL->n);
+        }
 
-          SL->L[SL->n*i+i] = 1;
-          for (int j=i+1; j<SL->n; j++) {
-              double m = copia[SL->n*j+i] / copia[SL->n*i+i];
-              copia[SL->n*j+i] = 0.0f;
-              SL->L[SL->n*j+i] = m;
-              for (int k=i+1; k<SL->n; k++)
-                  copia[SL->n*j+k] -= copia[SL->n*i+k] * m;
-          }
-      }
-    } else {
-      // Transforma a matriz em uma triangular sem pivoteamento
-      for (int i=0; i<SL->n; i++) 
-      {
-          SL->L[SL->n*i+i] = 1;
-          for (int j=i+1; j<SL->n; j++) {
-              double m = copia[SL->n*j+i] / copia[SL->n*i+i];
-              copia[SL->n*j+i] = 0.0f;
-              SL->L[SL->n*j+i] = m;
-              for (int k=i+1; k<SL->n; k++)
-                  copia[SL->n*j+k] -= copia[SL->n*i+k] * m;
-          }
-      }
+        SL->L[SL->n*i+i] = 1.0f;
+        for (int j=i+1; j<SL->n; j++) {
+            double m = copia[SL->n*j+i] / copia[SL->n*i+i];
+            copia[SL->n*j+i] = 0.0f;
+            SL->L[SL->n*j+i] = m;
+            for (int k=i+1; k<SL->n; k++)
+                copia[SL->n*j+k] -= copia[SL->n*i+k] * m;
+        }
     }
 
     *tTotal = timestamp() - *tTotal;
 
     SL->U = copia;
-
-    // checar se matriz é inversível
-    if (0.0f == determinanteU(SL->U, SL->n)) {
-      fprintf(stderr, "Erro Triangularizacao: Matriz não é inversível, Det = 0\n");
-      return -1;
-    }
-
     return 0;
-}
-
-/*!
-  \brief Gera uma matriz identidade a partir de uma norma n
-
-  \param n tamanho da matriz
-  \return matriz identidade n x n, NULL em caso de falha
-*/
-float *SL_geraIdentidade(unsigned int n) {
-
-	float *matId = SL_alocaMatrix(n);
-	if (!matId) {
-		perror("Erro ao alocar matriz identidade");
-		return NULL;
-	}
-	
-	for (int i=0; i<n; ++i)
-		matId[n*i+i] = 1.0f;
-
-	return matId;
-}
-
-/*!
-  \brief Gera a inversa de SL->A
-
-  Calcula o sistema Ly=I e Ux=y e armazena em Mat->Inv
-  \param Mat matriz original a ser invertida
-  \param matId matriz identidade
-  \param timeLy tempo para calculo de Ly=I
-  \param timeUx tempo para calculo de Ux=y
-*/
-void SL_geraInversa(t_sist *SL, double *timeLy, double *timeUx) {
-	
-  double timeSum = 0.0f;
-
-  // Calcula Ly=I
-	
-  for (int k=0; k<SL->n; ++k) 
-  {
-		*timeLy = timestamp();
-    for (int i=0; i<SL->n; ++i) {
-			SL->Inv[SL->n*i+k] = SL->Id[SL->n*k+i];
-			for (int j=i-1; j>=0; --j)
-				SL->Inv[SL->n*i+k] -= SL->L[SL->n*i+j] * SL->Inv[SL->n*j+k];
-			SL->Inv[SL->n*i+k] /= SL->L[SL->n*i+i];
-		}
-	  *timeLy = timestamp() - *timeLy;
-    timeSum += *timeLy;
-  }
-  
-  *timeLy = timeSum/SL->n;
-  timeSum = 0.0f;
-
-  // Calcula Ux=y
-  
-	for (int k=0; k<SL->n; ++k) 
-  {
-    *timeUx = timestamp();
-		for (int i=SL->n-1; i>=0; --i) {
-			for (int j=i+1; j<SL->n; ++j)
-				SL->Inv[SL->n*i+k] -= SL->U[SL->n*i+j] * SL->Inv[SL->n*j+k];
-			SL->Inv[SL->n*i+k] /= SL->U[SL->n*i+i];
-		}
-	  *timeUx = timestamp() - *timeUx;
-    timeSum += *timeUx;
-  }
-  
-  *timeUx = timeSum/SL->n;
 }
