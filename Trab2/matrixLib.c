@@ -30,24 +30,6 @@ float* SL_alocaMatrix(unsigned int n, unsigned int m) {
 }
 
 /*!
-  \brief Copia sistema linear
-
-  \param SL o sistema linear a ser copiado
-
-  \return cópia da matriz A do sistema. NULL se houve erro de alocação
-*/
-static float* copiaA(t_sist *SL) {
-
-	float *copia = SL_alocaMatrix(SL->n, SL->m);
-	if (!copia) return NULL;
-
-	for (unsigned int i=0; i<SL->n; ++i)
-		for (unsigned int j=0; j<SL->n; ++j)
-			copia[SL->n*i+j] = SL->A[SL->n*i+j];
-	return copia;
-}
-
-/*!
   \brief Aloca memória para o sistema linear
   \todo em caso de falha de alocação, é necessário limpar a memória previamente alocada (se houver)
 
@@ -57,7 +39,7 @@ static float* copiaA(t_sist *SL) {
 */
 t_sist *SL_aloca(unsigned int n, unsigned int m) {
 
-	t_sist *newSL = malloc(sizeof(t_sist));
+	t_sist *newSL = calloc(1, sizeof(t_sist));
 	if (!newSL) return NULL;
 
 	newSL->A = SL_alocaMatrix(n, m);
@@ -65,14 +47,12 @@ t_sist *SL_aloca(unsigned int n, unsigned int m) {
     free(newSL);
     return NULL;
   }
-
 	newSL->L = SL_alocaMatrix(n, n);
 	if (!newSL->L) {
     free(newSL->A);
     free(newSL);
     return NULL;
   }
-
   newSL->x = calloc(1, n * sizeof(float));
   if (!newSL->x) {
     free(newSL->L);
@@ -108,11 +88,11 @@ void SL_libera(t_sist *SL) {
 */
 t_sist *SL_leitura() {
 
-    char ln[1024];
+    // @todo alocação dinâmica p n estourar stack
+    char ln[4096];
     
     // extrai a linha contendo a ordem da matriz
     if (!fgets(ln, sizeof(ln), stdin)) {
-        perror("Falha de leitura");
         return NULL;
     }
 
@@ -184,39 +164,134 @@ void SL_printMatrix(FILE *f_out, float *matrix, unsigned int n, unsigned int m) 
 	fprintf(f_out,"\n");
   for (unsigned int i=0; i<m; ++i) {
 		for (unsigned int j=0; j<n; ++j)
-			fprintf(f_out,"%-10g ",matrix[n*i+j]);
+			fprintf(f_out,"%-1.18g ",matrix[n*i+j]);
 		fprintf(f_out,"\n");
 	}
   fprintf(f_out,"\n");
 }
 
+/*!
+ * \brief Realiza interpolação na matriz
+ *
+ * \param SL sistema linear
+ * \param row a linha da matriz de entrada
+ * \return retorna polinômio gerado pela interpolação
+ */
 float *SL_interpolacao(t_sist *SL, unsigned int row) {
 
+  // @todo OTIMIZAR REPETIÇÃO
   float *mat = SL_alocaMatrix(SL->n, SL->n);
   if (!mat) return NULL;
 
+  // @todo OTIMIZAR REPETIÇÃO
+  float *B = SL_alocaMatrix(1, SL->n);
+  if (!B) {
+    free(mat);
+    return NULL;
+  }
+  memcpy(B, SL->A + SL->n*row, SL->n*sizeof(float));
+
+  // @todo OTIMIZAR REPETIÇÃO
+  float *pol = SL_alocaMatrix(SL->n, 1); // polinomio
+  if (!pol) {
+    free(mat);
+    free(B);
+    return NULL;
+  }
+
+  // @todo OTIMIZAR TIRAR DAQUI
   for (unsigned int i=0; i<SL->n; ++i)
     for (unsigned int j=0; j<SL->n; ++j)
-      mat[SL->n*i+j] = powf(SL->x[i], (float)j);
-  SL->Int = mat;
-  SL_triangulariza(SL, &(double){0.0});
+      mat[SL->n*i+j] = powf(SL->x[i], j);
 
-  float *pol = SL_alocaMatrix(SL->n, 1); // polinomio
-  if (!pol) return NULL;
+  // @todo OTIMIZAR REPETIÇÃO
+  if (SL->Int) free(SL->Int);
+  SL->Int = mat;
+  SL_triangulariza(SL, B, &(double){0.0});
 
   for (int i=0; i<SL->n; ++i) {
-    pol[i] = SL->A[SL->m*row+i];
+    pol[i] = B[i];
     for (int j=i-1; j>=0; --j)
       pol[i] -= SL->L[SL->n*i+j] * pol[j];
     pol[i] /= SL->L[SL->n*i+i];
   }
-
   for (int i=SL->n-1; i>=0; --i) {
     for (int j=i+1; j<SL->n; ++j)
       pol[i] -= SL->U[SL->n*i+j] * pol[j];
     pol[i] /= SL->U[SL->n*i+i];
   }
 
+  free(B);
+  return pol;
+}
+
+/*!
+ * \brief Realiza ajuste de curvas na matriz
+ *
+ * \param SL sistema linear
+ * \param row a linha da matriz de entrada
+ * \return retorna polinômio gerado pelo ajuste de curvas
+ */
+float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row) {
+
+  // @todo OTIMIZAR REPETIÇÃO
+  float *mat = SL_alocaMatrix(SL->n, SL->n);
+  if (!mat) return NULL;
+
+  // @todo OTIMIZAR REPETIÇÃO
+  float *B = SL_alocaMatrix(1, SL->n);
+  if (!B) {
+    free(mat);
+    return NULL;
+  }
+  memcpy(B, SL->A + SL->n*row, SL->n*sizeof(float));
+
+  // @todo OTIMIZAR REPETIÇÃO
+  float *pol = SL_alocaMatrix(SL->n, 1); // polinomio
+  if (!pol) {
+    free(mat);
+    free(B);
+    return NULL;
+  }
+
+#if 1 /* OTIMIZADO */
+  // primeira linha da matriz (j: coluna, k: somatório)
+  for (unsigned int j=0; j < SL->n; ++j)
+    for (unsigned int k=0; k < SL->n; ++k) {
+      mat[j] += powf(SL->x[k], j);
+    }
+
+  // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
+  for (unsigned int i=1; i < SL->n; ++i) {
+    for (unsigned int j=0; j < SL->n-1; ++j)
+      mat[SL->n*i+j] = mat[SL->n*(i-1)+(j+1)];
+    for (unsigned int k=0; k < SL->n; ++k)
+      mat[SL->n*i+(SL->n-1)] += powf(SL->x[k], i) * powf(SL->x[k], SL->n-1);
+  }
+#else /* NÃO OTIMIZADO */
+  for (unsigned int i=0; i < SL->n; ++i)
+    for (unsigned int j=0; j < SL->n; ++j)
+      for (unsigned int k=0; k < SL->n; ++k)
+        mat[SL->n*i+j] += powf(SL->x[k], i) * powf(SL->x[k], j);
+#endif
+  if (SL->Int) free(SL->Int);
+  SL->Int = mat;
+  SL_triangulariza(SL, B, &(double){0.0});
+
+  for (int i=0; i<SL->n; ++i) { // colunas
+    for (int j=0; j<SL->n; ++j)
+      pol[i] += SL->A[SL->n*row+j] * powf(SL->x[j], i);
+    for (int k=i-1; k>=0; --k)
+      pol[i] -= SL->L[SL->n*i+k] * pol[k];
+    pol[i] /= SL->L[SL->n*i+i];
+  }
+  for (int i=SL->n-1; i>=0; --i) {
+    for (int j=i+1; j<SL->n; ++j)
+      pol[i] -= SL->U[SL->n*i+j] * pol[j];
+    pol[i] /= SL->U[SL->n*i+i];
+  }
+
+  free(B);
   return pol;
 }
 
@@ -262,16 +337,14 @@ static void trocaElemento (float *a, float *b)
 */
 static void trocaLinha (float *matrix, unsigned int i, unsigned int j, unsigned int n) {
 
-    float *aux = malloc(n*sizeof(float));;
+    float *aux = malloc(n*sizeof(float));
     if(!aux) {
       perror("Sem memória");
       return;
     }
-
     memcpy(aux, &matrix[n*i], n*sizeof(float));
     memcpy(&matrix[n*i], &matrix[n*j], n*sizeof(float));
     memcpy(&matrix[n*j], aux, n*sizeof(float));
-
     free(aux);
 }
 
@@ -280,10 +353,11 @@ static void trocaLinha (float *matrix, unsigned int i, unsigned int j, unsigned 
   \note separa SL->A em L e U
 
   \param SL o sistema linear a ser triangularizado
+  \param B termos independentes
   \param tTotal recebe tempo decorrido para cálculo
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza(t_sist *SL, double *tTotal) {
+int SL_triangulariza(t_sist *SL, float *B, double *tTotal) {
     
     float *copia = malloc(SL->n * SL->n * sizeof(float));
     memcpy(copia, SL->Int, SL->n * SL->n * sizeof(float));
@@ -301,7 +375,7 @@ int SL_triangulariza(t_sist *SL, double *tTotal) {
     {
         pivo = maxValue(copia,SL->n,i);
         if (pivo != i) {
-            trocaElemento(&SL->A[SL->m*i+pivo-1], &SL->A[SL->m*i+i-1]);
+            trocaElemento(B+i,B+pivo); // troca termo independente
             trocaLinha(copia,i,pivo,SL->n);
             trocaLinha(SL->Int,i,pivo,SL->n);
             trocaLinha(SL->L,i,pivo,SL->n);
@@ -319,6 +393,7 @@ int SL_triangulariza(t_sist *SL, double *tTotal) {
 
     *tTotal = timestamp() - *tTotal;
 
+    if (SL->U) free(SL->U);
     SL->U = copia;
     return 0;
 }

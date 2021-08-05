@@ -22,6 +22,7 @@ void SL_libera(t_sist *SL);
 t_sist *SL_leitura();
 
 float *SL_interpolacao(t_sist *SL, unsigned int row);
-int SL_triangulariza(t_sist *SL, double *tTotal);
+float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row);
+int SL_triangulariza(t_sist *SL, float *B, double *tTotal);
 
 #endif // __MATRIXLIB__

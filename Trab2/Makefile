@@ -1,5 +1,5 @@
 CC     = gcc -g -std=c11
-CFLAGS = 
+CFLAGS = -Wall
 LFLAGS = -lm
 
 PROG = matrixInv 
