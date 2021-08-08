@@ -244,7 +244,6 @@ float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row) {
     free(mat);
     return NULL;
   }
-  memcpy(B, SL->A + SL->n*row, SL->n*sizeof(float));
 
   // @todo OTIMIZAR REPETIÇÃO
   float *pol = SL_alocaMatrix(SL->n, 1); // polinomio
@@ -256,17 +255,22 @@ float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row) {
 
 #if 1 /* OTIMIZADO */
   // primeira linha da matriz (j: coluna, k: somatório)
-  for (unsigned int j=0; j < SL->n; ++j)
+  for (unsigned int j=0; j < SL->n; ++j) {
     for (unsigned int k=0; k < SL->n; ++k) {
       mat[j] += powf(SL->x[k], j);
     }
+    B[0] += SL->A[SL->n*row+j];
+  }
 
   // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
   for (unsigned int i=1; i < SL->n; ++i) {
-    for (unsigned int j=0; j < SL->n-1; ++j)
+    for (unsigned int j=0; j < SL->n-1; ++j) {
       mat[SL->n*i+j] = mat[SL->n*(i-1)+(j+1)];
+      B[i] += SL->A[SL->n*row+j] * powf(SL->x[j], i);
+    }
     for (unsigned int k=0; k < SL->n; ++k)
       mat[SL->n*i+(SL->n-1)] += powf(SL->x[k], i) * powf(SL->x[k], SL->n-1);
+    B[i] += SL->A[SL->n*row+(SL->n-1)] * powf(SL->x[SL->n-1], i);
   }
 #else /* NÃO OTIMIZADO */
   for (unsigned int i=0; i < SL->n; ++i)
@@ -274,15 +278,15 @@ float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row) {
       for (unsigned int k=0; k < SL->n; ++k)
         mat[SL->n*i+j] += powf(SL->x[k], i) * powf(SL->x[k], j);
 #endif
+  
   if (SL->Int) free(SL->Int);
   SL->Int = mat;
   SL_triangulariza(SL, B, &(double){0.0});
 
-  for (int i=0; i<SL->n; ++i) { // colunas
-    for (int j=0; j<SL->n; ++j)
-      pol[i] += SL->A[SL->n*row+j] * powf(SL->x[j], i);
-    for (int k=i-1; k>=0; --k)
-      pol[i] -= SL->L[SL->n*i+k] * pol[k];
+  for (int i=0; i<SL->n; ++i) {
+    pol[i] = B[i];
+    for (int j=i-1; j>=0; --j)
+      pol[i] -= SL->L[SL->n*i+j] * pol[j];
     pol[i] /= SL->L[SL->n*i+i];
   }
   for (int i=SL->n-1; i>=0; --i) {
