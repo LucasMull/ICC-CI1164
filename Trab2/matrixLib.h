@@ -8,21 +8,21 @@
 
 typedef struct {
     unsigned int n, m;
-    float *A, *Int;
-    float *L, *U;
-    float *x;
+    double *A, *Int, *Ajc;
+    double *L, *U;
+    double *x;
 } t_sist;
 
 
-float* SL_alocaMatrix(unsigned int n, unsigned int m);
-void SL_printMatrix(FILE *f_out, float *matrix, unsigned int n, unsigned int m);
+double* SL_alocaMatrix(unsigned int n, unsigned int m);
+void SL_printMatrix(FILE *f_out, double *matrix, unsigned int n, unsigned int m);
 
 t_sist *SL_aloca(unsigned int n, unsigned int m);
 void SL_libera(t_sist *SL);
 t_sist *SL_leitura();
 
-float *SL_interpolacao(t_sist *SL, unsigned int row);
-float *SL_ajusteDeCurvas(t_sist *SL, unsigned int row);
-int SL_triangulariza(t_sist *SL, float *B, double *tTotal);
+double *SL_interpolacao(t_sist *SL, unsigned int row, double *B);
+double *SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B);
+int SL_triangulariza(t_sist *SL, double *mat, double *B);
 
 #endif // __MATRIXLIB__
