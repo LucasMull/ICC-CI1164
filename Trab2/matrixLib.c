@@ -213,22 +213,21 @@ double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
       SL->Int = SL_alocaMatrix(SL->n, SL->n);
       if (!SL->Int) return NULL;
       
-      for (int i=0; i<SL->n; ++i) {
-          for (int j=0; j < SL->n - (SL->n % FATOR_UNROLL); j += FATOR_UNROLL) {
+      for (int i=0; i<(SL->n - (SL->n % FATOR_UNROLL)); i += FATOR_UNROLL)
+          for (int j=0; j < SL->n; ++j) {
               SL->Int[SL->n*i+j] = pot(SL->x[i], j);
-              SL->Int[SL->n*i+j+1] = pot(SL->x[i], j+1);
-              SL->Int[SL->n*i+j+2] = pot(SL->x[i], j+2);
-              SL->Int[SL->n*i+j+3] = pot(SL->x[i], j+3);
-              SL->Int[SL->n*i+j+4] = pot(SL->x[i], j+4);
-              SL->Int[SL->n*i+j+5] = pot(SL->x[i], j+5);
-              SL->Int[SL->n*i+j+6] = pot(SL->x[i], j+6);
-              SL->Int[SL->n*i+j+7] = pot(SL->x[i], j+7);
+              SL->Int[SL->n*(i+1)+j] = pot(SL->x[i+1], j);
+              SL->Int[SL->n*(i+2)+j] = pot(SL->x[i+2], j);
+              SL->Int[SL->n*(i+3)+j] = pot(SL->x[i+3], j);
+              SL->Int[SL->n*(i+4)+j] = pot(SL->x[i+4], j);
+              SL->Int[SL->n*(i+5)+j] = pot(SL->x[i+5], j);
+              SL->Int[SL->n*(i+6)+j] = pot(SL->x[i+6], j);
+              SL->Int[SL->n*(i+7)+j] = pot(SL->x[i+7], j);
           }
 
-          for (int i=0; i < SL->n; ++i)
-              for (int j=SL->n - (SL->n % FATOR_UNROLL); j < SL->n; ++j)
-                  SL->Int[SL->n*i+j] = pot(SL->x[i], j);
-      }
+      for (int i=(SL->n - (SL->n % FATOR_UNROLL)); i < SL->n; ++i)
+          for (int j=0; j<SL->n; ++j)
+              SL->Int[SL->n*i+j] = pot(SL->x[i], j);
   }
 
   // copia termos independentes para B
