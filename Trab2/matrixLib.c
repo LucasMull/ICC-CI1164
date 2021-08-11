@@ -324,9 +324,10 @@ static void trocaElemento(double *a, double *b)
   \param j linha a ser trocada com i
   \return 0 para sucesso e -1 para falha
 */
-static int trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
+static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
 
-    double *aux = malloc(n*sizeof(double));
+    /*
+    double aux = malloc(n*sizeof(double));
 
     if(!aux) {
         perror("Sem memória");
@@ -337,8 +338,18 @@ static int trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int 
     memcpy(&mat[n*j], aux, n*sizeof(double));
 
     free(aux);
-
+    
     return 0;
+    */ 
+    // Versão sem realocação
+    double aux;
+    double *a = &mat[n*i], *b = &mat[n*j];
+
+    for (unsigned int k = 0; k<n; ++k) {
+      aux = *(a+k);
+      *(a+k) = *(b+k);
+      *(b+k) = aux;
+    }    
 }
 
 /*!
@@ -371,8 +382,8 @@ int SL_triangulariza(t_sist *SL, double *mat, double *B) {
         pivo = maxValue(SL->U,SL->n,i);
         if (pivo != i) {
             trocaElemento(B+i, B+pivo); // troca termo independente
-            if (trocaLinha(SL->U, i, pivo, SL->n)) return -1;
-            if (trocaLinha(SL->L, i, pivo, SL->n)) return -1;
+            trocaLinha(SL->U, i, pivo, SL->n);
+            trocaLinha(SL->L, i, pivo, SL->n);
         }
 
         SL->L[SL->n*i+i] = 1.0f;
