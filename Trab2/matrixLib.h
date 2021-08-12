@@ -22,7 +22,7 @@ void SL_libera(t_sist *SL);
 t_sist *SL_leitura();
 
 int SL_interpolacao(t_sist *SL, unsigned int row, double *B);
-int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B);
+int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B, double *lookup);
 int SL_triangulariza(t_sist *SL, double *mat, double *B);
 int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B);
 void SL_substituicao(t_sist *SL, double *B, double *pol);

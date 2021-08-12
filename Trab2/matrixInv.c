@@ -30,24 +30,36 @@ int main (int argc, char **argv) {
         double *pol = SL_alocaMatrix(1, SL->n);
         if (!pol) return EXIT_FAILURE;
 
+        // guardar valores de x exp
+        double *lookup = SL_alocaMatrix(SL->n, SL->n);
+        if (!lookup) return EXIT_FAILURE;
+
         for (int i=0; i<SL->m; ++i) {
-            if (SL_interpolacao(SL, i, B)) return EXIT_FAILURE;
+            if (SL_interpolacao(SL, i, B))
+              return EXIT_FAILURE;
 		
             // separa SL->Int em LU
-            if (SL_triangulariza(SL, SL->Int, B)) return EXIT_FAILURE;
+            if (SL_triangulariza(SL, SL->Int, B)) 
+              return EXIT_FAILURE;
+
             SL_substituicao(SL, B, pol);
 
             SL_printMatrix(f_out, pol, SL->n, 1);
 	    
-            if (SL_ajusteDeCurvas(SL, i, B)) return EXIT_FAILURE;
+            if (SL_ajusteDeCurvas(SL, i, B, lookup))
+              return EXIT_FAILURE;
 
             // separa SL->Ajc em LU
-            if (SL_triangulariza_otimiz(SL, SL->Ajc, B)) return EXIT_FAILURE;
+            if (SL_triangulariza_otimiz(SL, SL->Ajc, B))
+              return EXIT_FAILURE;
 
             SL_substituicao(SL, B, pol);
 		
             SL_printMatrix(f_out, pol, SL->n, 1);
         }
+
+        free(lookup);
+        free(pol);
         free(B);
         SL_libera(SL);
     }

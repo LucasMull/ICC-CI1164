@@ -259,28 +259,39 @@ int SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
  * \param SL sistema linear
  * \param row a linha da matriz de entrada
  * \param B termos independentes
+ * \param lookup lookup table contendo os valores intermediários do somatório
  * \return retorna 0 para sucesso e -1 para falha
  */
-int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
+int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B, double *lookup) {
 
   if (!SL->Ajc) {
       SL->Ajc = SL_alocaMatrix(SL->n, SL->n);
       if (!SL->Ajc) return -1;
-        
+
+      // primeira linha iguala tudo a 1.0
+      for (unsigned int j=0; j < SL->n; ++j)
+          lookup[j] = 1.0;
+
+      // segunda linha é igual ao valor original de x
+      memcpy(lookup + SL->n, SL->x, SL->n*sizeof(double));
+
+      // preenche o restante das linhas com os valores intermediarios do somatorio
+      for (unsigned int i=2; i < SL->n; ++i)
+          for (unsigned int j=0; j < SL->n; ++j)
+              lookup[SL->n*i+j] = lookup[SL->n*(i-1)+j] * SL->x[j];
+
       // primeira linha da matriz (j: coluna, k: somatório)
-      // zera os valores de B
-      memset(B, 0, SL->n*sizeof(double));
       for (unsigned int j=0; j < SL->n; ++j)
           for (unsigned int k=0; k < SL->n; ++k)
-              SL->Ajc[j] += pot(SL->x[k], j);
+              SL->Ajc[j] += lookup[SL->n*j+k];
 
       // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
       for (unsigned int i=1; i < SL->n; ++i) {
           for (unsigned int j=0; j < SL->n-1; ++j) { // Loop merging
               SL->Ajc[SL->n*i+j] = SL->Ajc[SL->n*(i-1)+(j+1)];
-              SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[j], i) * pot (SL->x[j], SL->n-1); // TODO: explicar otimização junta expoentes mesma base
+              SL->Ajc[SL->n*i+(SL->n-1)] += lookup[SL->n*i+j] * lookup[SL->n*(SL->n-1)+j];
           }
-          SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[SL->n-1], i) * pot(SL->x[SL->n-1], SL->n-1); // Última soma
+          SL->Ajc[SL->n*i+(SL->n-1)] += lookup[SL->n*i+SL->n-1] * lookup[SL->n*(SL->n-1)+SL->n-1]; // Última soma
       }
   }
 
@@ -288,7 +299,7 @@ int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
   memset(B, 0, SL->n*sizeof(double));
   for (unsigned int i=0; i<SL->n; ++i)
       for (unsigned int j=0; j<SL->n; ++j)
-          B[i] += SL->A[SL->n*row+j] * pot(SL->x[j], i);
+          B[i] += SL->A[SL->n*row+j] * lookup[SL->n*i+j];
 
   return 0;
 }
