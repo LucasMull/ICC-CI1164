@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
             if (SL_triangulariza_otimiz(Int)) return EXIT_FAILURE;
 
             SL_substituicao(Int, pol);
-            SL_printMatrix(stderr, pol, SL->n, 1);
+            //SL_printMatrix(stderr, pol, SL->n, 1);
 	    
             LIKWID_MARKER_START("AjusteDeCurvas");
             if (SL_ajusteDeCurvas(SL, Ajc, i, lookup)) return EXIT_FAILURE;
@@ -60,11 +60,10 @@ int main (int argc, char **argv) {
 
             LIKWID_MARKER_START("TriangularizaOtimiz");
             if (SL_triangulariza_otimiz(Ajc)) return EXIT_FAILURE;
+	    SL_substituicao(Ajc, pol);
             LIKWID_MARKER_STOP("TriangularizaOtimiz");
 
-            SL_substituicao(Ajc, pol);
-
-            SL_printMatrix(stderr, pol, SL->n, 1);
+            //SL_printMatrix(stderr, pol, SL->n, 1);
 
             LIKWID_MARKER_START("Triangulariza");
             if (SL_triangulariza(Ajc)) return EXIT_FAILURE;

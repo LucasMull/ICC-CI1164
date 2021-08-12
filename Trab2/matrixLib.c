@@ -361,7 +361,7 @@ int SL_triangulariza_otimiz(t_sist *SL) {
       if (!SL->U) return -1;
       SL->vetTroca = calloc(1, SL->n*2*sizeof(int));
       if (!SL->vetTroca) return -1;
-    }
+    
     memcpy(SL->U, SL->A, SL->n * SL->n * sizeof(double));
 
     // Transforma a matriz em uma triangular com pivoteamento parcial
@@ -386,6 +386,7 @@ int SL_triangulariza_otimiz(t_sist *SL) {
             for (int k=i+1; k<SL->n; k++)
                 SL->U[SL->n*j+k] -= SL->U[SL->n*i+k] * m;
         }
+    }
     }
     return 0;
 }

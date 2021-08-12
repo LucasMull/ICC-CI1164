@@ -1,24 +1,33 @@
-CC     = gcc -g -std=c11
-CFLAGS = -Wall -D_NO_LIKWID
-LFLAGS = -lm
+PROG  = matrixInv
 
-PROG = matrixInv 
-OBJS = matrixLib.o utils.o
+CC   = gcc -std=c11 -g
+OBJS = matrixLib.o
 
-.PHONY: limpa faxina clean purge all
+CFLAGS = -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
+LFLAGS = -L${LIKWID_LIB} -llikwid -lm
 
-all: $(PROG)
+.PHONY: all debug clean limpa purge faxina
 
-%.o: %.c matrixLib.h
-	$(CC) -c $(CFLAGS) $<
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $<
 
-$(PROG) : % :  $(OBJS) %.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LFLAGS)
+all: $(PRINT) $(PROG)
 
-limpa clean:
-	@rm -f *~ *.bak
+debug: CFLAGS += -DDEBUG
+debug: $(PROG)
 
-faxina purge:   limpa
-	@rm -f *.o core a.out
-	@rm -f $(PROG)
+$(PROG):  $(PROG).o
+$(PRINT): 
+	$(CC) $(CFLAGS) -o $@ $@.c
 
+$(PROG): $(OBJS) 
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+
+clean limpa:
+	@echo "Limpando ...."
+	@rm -f *~ *.bak *.tmp
+
+purge faxina:   clean
+	@echo "Faxina ...."
+	@rm -f  $(PROG) $(PRINT) *.o core a.out
+	@rm -f *.png marker.out *.log

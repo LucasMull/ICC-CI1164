@@ -16,9 +16,10 @@ echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 
 make
 
-for SIZE in 64
+for SIZE in 10 32 50 64 100 128 200 256 300 400 512 1000
+
 do
-	python3 gera_entrada $SIZE | ${LIKWID_CMD} ./matmult > ./Resultados/$1_$SIZE.txt
+	python3 gera_entrada $SIZE | ${LIKWID_CMD} ./matrixInv > ./Resultados/$1_$SIZE.txt
 done
 
 make purge

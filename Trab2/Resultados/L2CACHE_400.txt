@@ -1,0 +1,98 @@
+--------------------------------------------------------------------------------
+CPU name:	Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz
+CPU type:	Intel Coffeelake processor
+CPU clock:	3.41 GHz
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407993108 GHz,
+TABLE,Region Interpolacao,Group 1 Raw,L2CACHE,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.000435,
+call count,5,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,1039456
+CPU_CLK_UNHALTED_CORE,FIXC1,718483
+CPU_CLK_UNHALTED_REF,FIXC2,646100
+L2_TRANS_ALL_REQUESTS,PMC0,67906
+L2_RQSTS_MISS,PMC1,15953
+TABLE,Region Interpolacao,Group 1 Metric,L2CACHE,7
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0004,
+Runtime unhalted [s],0.0002,
+Clock [MHz],3789.7928,
+CPI,0.6912,
+L2 request rate,0.0653,
+L2 miss rate,0.0153,
+L2 miss ratio,0.2349,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407993108 GHz,
+TABLE,Region AjusteDeCurvas,Group 1 Raw,L2CACHE,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.002771,
+call count,5,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,11402850
+CPU_CLK_UNHALTED_CORE,FIXC1,7657564
+CPU_CLK_UNHALTED_REF,FIXC2,6884444
+L2_TRANS_ALL_REQUESTS,PMC0,624615
+L2_RQSTS_MISS,PMC1,203042
+TABLE,Region AjusteDeCurvas,Group 1 Metric,L2CACHE,7
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0028,
+Runtime unhalted [s],0.0022,
+Clock [MHz],3790.7092,
+CPI,0.6715,
+L2 request rate,0.0548,
+L2 miss rate,0.0178,
+L2 miss ratio,0.3251,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407993108 GHz,
+TABLE,Region TriangularizaOtimiz,Group 1 Raw,L2CACHE,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.019458,
+call count,5,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,223054200
+CPU_CLK_UNHALTED_CORE,FIXC1,71497510
+CPU_CLK_UNHALTED_REF,FIXC2,64288800
+L2_TRANS_ALL_REQUESTS,PMC0,17434720
+L2_RQSTS_MISS,PMC1,4477708
+TABLE,Region TriangularizaOtimiz,Group 1 Metric,L2CACHE,7
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0195,
+Runtime unhalted [s],0.0210,
+Clock [MHz],3790.1317,
+CPI,0.3205,
+L2 request rate,0.0782,
+L2 miss rate,0.0201,
+L2 miss ratio,0.2568,
+STRUCT,Info,3
+CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
+CPU type:,Intel Coffeelake processor,
+CPU clock:,3.407993108 GHz,
+TABLE,Region Triangulariza,Group 1 Raw,L2CACHE,5
+Region Info,Core 3,
+RDTSC Runtime [s],0.091250,
+call count,5,
+Event,Counter,Core 3
+INSTR_RETIRED_ANY,FIXC0,1080849000
+CPU_CLK_UNHALTED_CORE,FIXC1,340918600
+CPU_CLK_UNHALTED_REF,FIXC2,306496500
+L2_TRANS_ALL_REQUESTS,PMC0,84189340
+L2_RQSTS_MISS,PMC1,21541160
+TABLE,Region Triangulariza,Group 1 Metric,L2CACHE,7
+Metric,Core 3,
+Runtime (RDTSC) [s],0.0913,
+Runtime unhalted [s],0.1000,
+Clock [MHz],3790.7390,
+CPI,0.3154,
+L2 request rate,0.0779,
+L2 miss rate,0.0199,
+L2 miss ratio,0.2559,
