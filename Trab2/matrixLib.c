@@ -28,17 +28,21 @@ static inline double pot(double base, unsigned int expoente) {
   return base;
 }
 
+static void trocaElemento(double *a, double *b);
+
 /*!
  * \brief Substituição LU
  *
  * \param SL o sistema linear contendo L e U previamente obtidos
- * \param B termos independentes
  * \param pol vetor do polinomio resultante 1xn previamente alocado
  */
-void SL_substituicao(t_sist *SL, double *B, double *pol) {
+void SL_substituicao(t_sist *SL, double *pol) {
+
+  for (int i=0; i<SL->n; ++i)
+    trocaElemento(&SL->B[SL->vetTroca[2*i]], &SL->B[SL->vetTroca[2*i+1]]);
 
   for (int i=0; i<SL->n; ++i) {
-      pol[i] = B[i];
+      pol[i] = SL->B[i];
       for (int j=i-1; j>=0; --j)
           pol[i] -= SL->L[SL->n*i+j] * pol[j];
       pol[i] /= SL->L[SL->n*i+i];
@@ -99,14 +103,6 @@ t_sist *SL_aloca(unsigned int n, unsigned int m) {
     free(newSL);
     return NULL;
   }
-  newSL->U = SL_alocaMatrix(n, n);
-  if (!newSL->U) {
-    free(newSL->L);
-    free(newSL->x);
-    free(newSL->A);
-    free(newSL);
-    return NULL;
-  }
 
   newSL->n = n;
   newSL->m = m;
@@ -124,9 +120,8 @@ void SL_libera(t_sist *SL) {
   free(SL->A);
   free(SL->x);
   free(SL->L);
-  free(SL->U);
-  if (SL->Int) free(SL->Int);
-  if (SL->Ajc) free(SL->Ajc);
+  if (SL->U) free(SL->U);
+  if (SL->vetTroca) free(SL->vetTroca);
   free(SL);
 }
 
@@ -195,60 +190,57 @@ void SL_printMatrix(FILE *f_out, double *matrix, unsigned int n, unsigned int m)
  * \brief Realiza interpolação na matriz
  *
  * \param SL sistema linear
+ * \param Int sistema após interpolação
  * \param row a linha da matriz de entrada
- * \param B vetor de termos independentes do SL->Int
  * \return retorna 0 para sucesso e -1 para falha
  *
  * \note A otimização escolhida foi unroll e jam
  */
-int SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
+int SL_interpolacao(t_sist *SL, t_sist *Int, unsigned int row) {
 
-  if (!SL->Int) {
-      SL->Int = SL_alocaMatrix(SL->n, SL->n);
-      if (!SL->Int) return -1;
-      
-      for (int i=0; i<(SL->n - (SL->n % 8)); i += 8) {
+  if (row == 0) {
+      for (int i=0; i<(Int->n - (Int->n % 8)); i += 8) {
           // NOTA OTIMIZAÇÃO: como qualquer valor elevado a 0 é possível evitar chamadas desnecessárias a pot()
-          SL->Int[SL->n*i] = SL->Int[SL->n*(i+1)] =     \
-          SL->Int[SL->n*(i+2)] = SL->Int[SL->n*(i+3)] = \
-          SL->Int[SL->n*(i+4)] = SL->Int[SL->n*(i+5)] = \
-          SL->Int[SL->n*(i+6)] = SL->Int[SL->n*(i+7)] = 1.0;
+          Int->A[Int->n*i] = Int->A[Int->n*(i+1)] =     \
+          Int->A[Int->n*(i+2)] = Int->A[Int->n*(i+3)] = \
+          Int->A[Int->n*(i+4)] = Int->A[Int->n*(i+5)] = \
+          Int->A[Int->n*(i+6)] = Int->A[Int->n*(i+7)] = 1.0;
           
           // NOTA OTIMIZAÇÃO: como qualquer valor elevado a 1 é ele mesmo é possível evitar chamadas desnecessárias a pot()
-          SL->Int[SL->n*i+1] = SL->x[i];
-          SL->Int[SL->n*(i+1)+1] = SL->x[i+1];
-          SL->Int[SL->n*(i+2)+1] = SL->x[i+2];
-          SL->Int[SL->n*(i+3)+1] = SL->x[i+3];
-          SL->Int[SL->n*(i+4)+1] = SL->x[i+4];
-          SL->Int[SL->n*(i+5)+1] = SL->x[i+5];
-          SL->Int[SL->n*(i+6)+1] = SL->x[i+6];
-          SL->Int[SL->n*(i+7)+1] = SL->x[i+7];
+          Int->A[Int->n*i+1] = SL->x[i];
+          Int->A[Int->n*(i+1)+1] = SL->x[i+1];
+          Int->A[Int->n*(i+2)+1] = SL->x[i+2];
+          Int->A[Int->n*(i+3)+1] = SL->x[i+3];
+          Int->A[Int->n*(i+4)+1] = SL->x[i+4];
+          Int->A[Int->n*(i+5)+1] = SL->x[i+5];
+          Int->A[Int->n*(i+6)+1] = SL->x[i+6];
+          Int->A[Int->n*(i+7)+1] = SL->x[i+7];
 
           // NOTA OTIMIZAÇÃO: é possível evitar chamadas à função pot() se multiplicar o valor da coluna anterior ao da coluna 1
-          for (int j=2; j < SL->n; ++j) {
-              SL->Int[SL->n*i+j] = SL->Int[SL->n*i+1] * SL->Int[SL->n*i+(j-1)];
-              SL->Int[SL->n*(i+1)+j] = SL->Int[SL->n*(i+1)+1] * SL->Int[SL->n*(i+1)+(j-1)];
-              SL->Int[SL->n*(i+2)+j] = SL->Int[SL->n*(i+2)+1] * SL->Int[SL->n*(i+2)+(j-1)];
-              SL->Int[SL->n*(i+3)+j] = SL->Int[SL->n*(i+3)+1] * SL->Int[SL->n*(i+3)+(j-1)];
-              SL->Int[SL->n*(i+4)+j] = SL->Int[SL->n*(i+4)+1] * SL->Int[SL->n*(i+4)+(j-1)];
-              SL->Int[SL->n*(i+5)+j] = SL->Int[SL->n*(i+5)+1] * SL->Int[SL->n*(i+5)+(j-1)];
-              SL->Int[SL->n*(i+6)+j] = SL->Int[SL->n*(i+6)+1] * SL->Int[SL->n*(i+6)+(j-1)];
-              SL->Int[SL->n*(i+7)+j] = SL->Int[SL->n*(i+7)+1] * SL->Int[SL->n*(i+7)+(j-1)];
+          for (int j=2; j < Int->n; ++j) {
+              Int->A[Int->n*i+j] = Int->A[Int->n*i+1] * Int->A[Int->n*i+(j-1)];
+              Int->A[Int->n*(i+1)+j] = Int->A[Int->n*(i+1)+1] * Int->A[Int->n*(i+1)+(j-1)];
+              Int->A[Int->n*(i+2)+j] = Int->A[Int->n*(i+2)+1] * Int->A[Int->n*(i+2)+(j-1)];
+              Int->A[Int->n*(i+3)+j] = Int->A[Int->n*(i+3)+1] * Int->A[Int->n*(i+3)+(j-1)];
+              Int->A[Int->n*(i+4)+j] = Int->A[Int->n*(i+4)+1] * Int->A[Int->n*(i+4)+(j-1)];
+              Int->A[Int->n*(i+5)+j] = Int->A[Int->n*(i+5)+1] * Int->A[Int->n*(i+5)+(j-1)];
+              Int->A[Int->n*(i+6)+j] = Int->A[Int->n*(i+6)+1] * Int->A[Int->n*(i+6)+(j-1)];
+              Int->A[Int->n*(i+7)+j] = Int->A[Int->n*(i+7)+1] * Int->A[Int->n*(i+7)+(j-1)];
           }
       }
 
       // Remainder loop
-      for (int i=(SL->n - (SL->n % 8)); i < SL->n; ++i) {
-          SL->Int[SL->n*i] = 1.0;
-          SL->Int[SL->n*i+1] = SL->x[i];
-          for (int j=2; j<SL->n; ++j) {
-              SL->Int[SL->n*i+j] = SL->Int[SL->n*i+1] * SL->Int[SL->n*i+(j-1)];
+      for (int i=(Int->n - (Int->n % 8)); i < Int->n; ++i) {
+          Int->A[Int->n*i] = 1.0;
+          Int->A[Int->n*i+1] = SL->x[i];
+          for (int j=2; j<Int->n; ++j) {
+              Int->A[Int->n*i+j] = Int->A[Int->n*i+1] * Int->A[Int->n*i+(j-1)];
           }
       }
   }
 
   // copia termos independentes para B
-  memcpy(B, SL->A + SL->n*row, SL->n*sizeof(double));
+  memcpy(Int->B, SL->A + SL->n*row, SL->n*sizeof(double));
 
   return 0;
 }
@@ -257,17 +249,14 @@ int SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
  * \brief Realiza ajuste de curvas na matriz
  *
  * \param SL sistema linear
+ * \param Ajc sistema linear após ajuste de curvas
  * \param row a linha da matriz de entrada
- * \param B termos independentes
  * \param lookup lookup table contendo os valores intermediários do somatório
  * \return retorna 0 para sucesso e -1 para falha
  */
-int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B, double *lookup) {
+int SL_ajusteDeCurvas(t_sist *SL, t_sist *Ajc, unsigned int row, double *lookup) {
 
-  if (!SL->Ajc) {
-      SL->Ajc = SL_alocaMatrix(SL->n, SL->n);
-      if (!SL->Ajc) return -1;
-
+  if (row == 0) {
       // primeira linha iguala tudo a 1.0
       for (unsigned int j=0; j < SL->n; ++j)
           lookup[j] = 1.0;
@@ -281,25 +270,25 @@ int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B, double *lookup) {
               lookup[SL->n*i+j] = lookup[SL->n*(i-1)+j] * SL->x[j];
 
       // primeira linha da matriz (j: coluna, k: somatório)
-      for (unsigned int j=0; j < SL->n; ++j)
-          for (unsigned int k=0; k < SL->n; ++k)
-              SL->Ajc[j] += lookup[SL->n*j+k];
+      for (unsigned int j=0; j < Ajc->n; ++j)
+          for (unsigned int k=0; k < Ajc->n; ++k)
+              Ajc->A[j] += lookup[Ajc->n*j+k];
 
       // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
-      for (unsigned int i=1; i < SL->n; ++i) {
-          for (unsigned int j=0; j < SL->n-1; ++j) { // Loop merging
-              SL->Ajc[SL->n*i+j] = SL->Ajc[SL->n*(i-1)+(j+1)];
-              SL->Ajc[SL->n*i+(SL->n-1)] += lookup[SL->n*i+j] * lookup[SL->n*(SL->n-1)+j];
+      for (unsigned int i=1; i < Ajc->n; ++i) {
+          for (unsigned int j=0; j < Ajc->n-1; ++j) { // Loop merging
+              Ajc->A[Ajc->n*i+j] = Ajc->A[Ajc->n*(i-1)+(j+1)];
+              Ajc->A[Ajc->n*i+(Ajc->n-1)] += lookup[Ajc->n*i+j] * lookup[Ajc->n*(Ajc->n-1)+j];
           }
-          SL->Ajc[SL->n*i+(SL->n-1)] += lookup[SL->n*i+SL->n-1] * lookup[SL->n*(SL->n-1)+SL->n-1]; // Última soma
+          Ajc->A[Ajc->n*i+(Ajc->n-1)] += lookup[Ajc->n*i+Ajc->n-1] * lookup[Ajc->n*(Ajc->n-1)+Ajc->n-1]; // Última soma
       }
   }
 
   // zera os valores de B
-  memset(B, 0, SL->n*sizeof(double));
-  for (unsigned int i=0; i<SL->n; ++i)
-      for (unsigned int j=0; j<SL->n; ++j)
-          B[i] += SL->A[SL->n*row+j] * lookup[SL->n*i+j];
+  memset(Ajc->B, 0, Ajc->n*sizeof(double));
+  for (unsigned int i=0; i<Ajc->n; ++i)
+      for (unsigned int j=0; j<Ajc->n; ++j)
+          Ajc->B[i] += SL->A[SL->n*row+j] * lookup[SL->n*i+j];
 
   return 0;
 }
@@ -347,18 +336,6 @@ static void trocaElemento(double *a, double *b)
 */
 static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
 
-#if 0 // Versão com realocação
-    double aux = malloc(n*sizeof(double));
-    if(!aux) {
-        perror("Sem memória");
-        return -1;
-    }
-    memcpy(aux, &mat[n*i], n*sizeof(double));
-    memcpy(&mat[n*i], &mat[n*j], n*sizeof(double));
-    memcpy(&mat[n*j], aux, n*sizeof(double));
-
-    free(aux);
-#else // Versão sem realocação
     double aux;
     double *a = &mat[n*i], *b = &mat[n*j];
 
@@ -367,7 +344,6 @@ static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int
         *(a+k) = *(b+k);
         *(b+k) = aux;
     }    
-#endif
 }
 
 /*!
@@ -376,12 +352,17 @@ static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int
 
   \param SL o sistema linear
   \param mat a matriz a ser triangularizada
-  \param B termos independentes
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
+int SL_triangulariza_otimiz(t_sist *SL) {
   
-    memcpy(SL->U, mat, SL->n * SL->n * sizeof(double));
+    if (!SL->U) {
+      SL->U = SL_alocaMatrix(SL->n, SL->n);
+      if (!SL->U) return -1;
+      SL->vetTroca = calloc(1, SL->n*2*sizeof(int));
+      if (!SL->vetTroca) return -1;
+    }
+    memcpy(SL->U, SL->A, SL->n * SL->n * sizeof(double));
 
     // Transforma a matriz em uma triangular com pivoteamento parcial
     int pivo;
@@ -390,7 +371,8 @@ int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
     for (int i=0; i<SL->n; i++) {
         pivo = maxValue(SL->U,SL->n,i);
         if (pivo != i) {
-            trocaElemento(B+i, B+pivo); // troca termo independente
+            SL->vetTroca[2*i] = i;
+            SL->vetTroca[2*i+1] = pivo;
             trocaLinha(SL->U, i, pivo, SL->n);
             trocaLinha(SL->L, i, pivo, SL->n);
         }
@@ -413,15 +395,13 @@ int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
   \note separa SL->A em L e U
 
   \param SL o sistema linear
-  \param mat a matriz a ser triangularizada
-  \param B termos independentes
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza(t_sist *SL, double *mat, double *B) {
+int SL_triangulariza(t_sist *SL) {
   
     double *copia = SL_alocaMatrix(SL->n, SL->n);
     if (!copia) return -1;
-    memcpy(copia, mat, SL->n * SL->n * sizeof(double));
+    memcpy(copia, SL->A, SL->n * SL->n * sizeof(double));
     
     // Transforma a matriz em uma triangular com pivoteamento parcial
     int pivo;
@@ -429,7 +409,7 @@ int SL_triangulariza(t_sist *SL, double *mat, double *B) {
     {
         pivo = maxValue(copia,SL->n,i);
         if (pivo != i) {
-            trocaElemento(B+i, B+pivo); // troca termo independente
+            trocaElemento(SL->B+i, SL->B+pivo); // troca termo independente
             trocaLinha(copia, i, pivo, SL->n);
             trocaLinha(SL->L, i, pivo, SL->n);
         }
