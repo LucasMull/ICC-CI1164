@@ -65,8 +65,10 @@ int main (int argc, char **argv) {
         if (!pol) return EXIT_FAILURE;
 
         for (int i=0; i<SL->m; ++i) {
-            if (SL_interpolacao(SL, i, B)) return EXIT_FAILURE;
-		
+            LIKWID_MARKER_START("Interpolacao");
+	    if (SL_interpolacao(SL, i, B)) return EXIT_FAILURE;
+	    LIKWID_MARKER_STOP("Interpolacao");
+
             // separa SL->Int em LU
             LIKWID_MARKER_START("Triangulariza");
             if (SL_triangulariza(SL, SL->Int, B)) return EXIT_FAILURE;

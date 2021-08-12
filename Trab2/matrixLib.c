@@ -278,9 +278,9 @@ int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
       for (unsigned int i=1; i < SL->n; ++i) {
           for (unsigned int j=0; j < SL->n-1; ++j) { // Loop merging
               SL->Ajc[SL->n*i+j] = SL->Ajc[SL->n*(i-1)+(j+1)];
-              SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[j], i + SL->n-1); // TODO: explicar otimização junta expoentes mesma base
+              SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[j], i) * pot (SL->x[j], SL->n-1); // TODO: explicar otimização junta expoentes mesma base
           }
-          SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[SL->n-1], i + SL->n-1); // Última soma
+          SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[SL->n-1], i) * pot(SL->x[SL->n-1], SL->n-1); // Última soma
       }
   }
 
