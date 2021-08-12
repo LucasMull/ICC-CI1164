@@ -1,5 +1,5 @@
 CC     = gcc -g -std=c11
-CFLAGS = -Wall
+CFLAGS = -Wall -D_NO_LIKWID
 LFLAGS = -lm
 
 PROG = matrixInv 
@@ -13,7 +13,7 @@ all: $(PROG)
 	$(CC) -c $(CFLAGS) $<
 
 $(PROG) : % :  $(OBJS) %.o
-	$(CC) -o $@ $^ $(LFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LFLAGS)
 
 limpa clean:
 	@rm -f *~ *.bak
