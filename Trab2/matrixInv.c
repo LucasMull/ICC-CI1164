@@ -14,7 +14,6 @@ int main (int argc, char **argv) {
     t_sist *SL;
     FILE *f_out = stdout;
 
-    double *vet;
     while (!feof(stdin))
     {
         SL = SL_leitura();
@@ -23,18 +22,25 @@ int main (int argc, char **argv) {
         double *B = SL_alocaMatrix(1, SL->n);
         if (!B) return EXIT_FAILURE;
 
+        double *pol = SL_alocaMatrix(1, SL->n);
+        if (!pol) return EXIT_FAILURE;
+
         for (int i=0; i<SL->m; ++i) {
-            vet = SL_interpolacao(SL, i, B);
-            if (!vet) return EXIT_FAILURE;
-            SL_printMatrix(f_out, vet, SL->n, 1);
+            if (SL_interpolacao(SL, i, B)) return EXIT_FAILURE;
+            
+            // separa SL->Int em LU
+            if (SL_triangulariza(SL, SL->Int, B)) return EXIT_FAILURE;
+            SL_substituicao(SL, B, pol);
 
-            free(vet);
+            SL_printMatrix(f_out, pol, SL->n, 1);
 
-            vet = SL_ajusteDeCurvas(SL, i, B);
-            if (!vet) return EXIT_FAILURE;
-            SL_printMatrix(f_out, vet, SL->n, 1);
+            if (SL_ajusteDeCurvas(SL, i, B)) return EXIT_FAILURE;
 
-            free(vet);
+            // separa SL->Ajc em LU
+            if (SL_triangulariza(SL, SL->Ajc, B)) return EXIT_FAILURE;
+            SL_substituicao(SL, B, pol);
+
+            SL_printMatrix(f_out, pol, SL->n, 1);
         }
 #if 0
         SL_printMatrix(f_out, SL->Int, SL->n, SL->n);

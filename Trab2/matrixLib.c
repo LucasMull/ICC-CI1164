@@ -11,11 +11,6 @@
 #include "utils.h"
 #include "matrixLib.h"
 
-#define FATOR_UNROLL 8
-
-#define L_IDX(n,i,j) (((i)*((i)-1))/2+(j)-1)
-#define U_IDX(n,i,j) ((n)*((i)-1)-((i)-2)*((i)-1)/2 + ((j)-(i)))
-
 /*!
  * \brief Retorna base elevada a um expoente inteiro
  *
@@ -38,12 +33,9 @@ static inline double pot(double base, unsigned int expoente) {
  *
  * \param SL o sistema linear contendo L e U previamente obtidos
  * \param B termos independentes
- * \return retorna polinômio
+ * \param pol vetor do polinomio resultante 1xn previamente alocado
  */
-static inline double* substituicao(t_sist *SL, double *B) {
-
-  double *pol = SL_alocaMatrix(1, SL->n);
-  if (!pol) return NULL;
+void SL_substituicao(t_sist *SL, double *B, double *pol) {
 
   for (int i=0; i<SL->n; ++i) {
       pol[i] = B[i];
@@ -56,7 +48,6 @@ static inline double* substituicao(t_sist *SL, double *B) {
           pol[i] -= SL->U[SL->n*i+j] * pol[j];
       pol[i] /= SL->U[SL->n*i+i];
   }
-  return pol;
 }
 
 /*!
@@ -97,10 +88,24 @@ t_sist *SL_aloca(unsigned int n, unsigned int m) {
   }
   newSL->x = calloc(1, n * sizeof(double));
   if (!newSL->x) {
-      free(newSL->L);
       free(newSL->A);
       free(newSL);
       return NULL;
+  }
+  newSL->L = SL_alocaMatrix(n, n);
+  if (!newSL->L) {
+    free(newSL->x);
+    free(newSL->A);
+    free(newSL);
+    return NULL;
+  }
+  newSL->U = SL_alocaMatrix(n, n);
+  if (!newSL->U) {
+    free(newSL->L);
+    free(newSL->x);
+    free(newSL->A);
+    free(newSL);
+    return NULL;
   }
 
   newSL->n = n;
@@ -118,8 +123,8 @@ void SL_libera(t_sist *SL) {
 
   free(SL->A);
   free(SL->x);
-  if (SL->L)   free(SL->L);
-  if (SL->U)   free(SL->U);
+  free(SL->L);
+  free(SL->U);
   if (SL->Int) free(SL->Int);
   if (SL->Ajc) free(SL->Ajc);
   free(SL);
@@ -205,15 +210,15 @@ void SL_printMatrix(FILE *f_out, double *matrix, unsigned int n, unsigned int m)
  * \param SL sistema linear
  * \param row a linha da matriz de entrada
  * \param B vetor de termos independentes do SL->Int
- * \return retorna polinômio gerado pela interpolação
+ * \return retorna 0 para sucesso e -1 para falha
  */
-double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
+int SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
 
   if (!SL->Int) {
       SL->Int = SL_alocaMatrix(SL->n, SL->n);
-      if (!SL->Int) return NULL;
+      if (!SL->Int) return -1;
       
-      for (int i=0; i<(SL->n - (SL->n % FATOR_UNROLL)); i += FATOR_UNROLL)
+      for (int i=0; i<(SL->n - (SL->n % 8)); i += 8)
           for (int j=0; j < SL->n; ++j) {
               SL->Int[SL->n*i+j] = pot(SL->x[i], j);
               SL->Int[SL->n*(i+1)+j] = pot(SL->x[i+1], j);
@@ -225,7 +230,7 @@ double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
               SL->Int[SL->n*(i+7)+j] = pot(SL->x[i+7], j);
           }
 
-      for (int i=(SL->n - (SL->n % FATOR_UNROLL)); i < SL->n; ++i)
+      for (int i=(SL->n - (SL->n % 8)); i < SL->n; ++i)
           for (int j=0; j<SL->n; ++j)
               SL->Int[SL->n*i+j] = pot(SL->x[i], j);
   }
@@ -233,11 +238,7 @@ double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
   // copia termos independentes para B
   memcpy(B, SL->A + SL->n*row, SL->n*sizeof(double));
 
-  // separa SL->Int em LU
-  if (SL_triangulariza_otimiz(SL, SL->Int, B)) return NULL;
-
-  // Realiza substituição LU e retorna polinomio resultante
-  return substituicao(SL, B);
+  return 0;
 }
 
 /*!
@@ -246,27 +247,27 @@ double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
  * \param SL sistema linear
  * \param row a linha da matriz de entrada
  * \param B termos independentes
- * \return retorna polinômio gerado pelo ajuste de curvas
+ * \return retorna 0 para sucesso e -1 para falha
  */
-double *SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
+int SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
 
   if (!SL->Ajc) {
       SL->Ajc = SL_alocaMatrix(SL->n, SL->n);
-      if (!SL->Ajc) return NULL;
-      
-    // primeira linha da matriz (j: coluna, k: somatório)
-    for (unsigned int j=0; j < SL->n; ++j)
-        for (unsigned int k=0; k < SL->n; ++k)
-            SL->Ajc[j] += pot(SL->x[k], j);
+      if (!SL->Ajc) return -1;
+        
+      // primeira linha da matriz (j: coluna, k: somatório)
+      for (unsigned int j=0; j < SL->n; ++j)
+          for (unsigned int k=0; k < SL->n; ++k)
+              SL->Ajc[j] += pot(SL->x[k], j);
 
-    // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
-    for (unsigned int i=1; i < SL->n; ++i) {
-        for (unsigned int j=0; j < SL->n-1; ++j) { // Loop merging
-            SL->Ajc[SL->n*i+j] = SL->Ajc[SL->n*(i-1)+(j+1)];
-            SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[j], i) * pot(SL->x[j], SL->n-1);
-        }
-        SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[SL->n-1], i) * pot(SL->x[SL->n-1], SL->n-1); // Última soma
-    }
+      // restante das linhas da matriz (i: linhas, j: coluna, k: somatório)
+      for (unsigned int i=1; i < SL->n; ++i) {
+          for (unsigned int j=0; j < SL->n-1; ++j) { // Loop merging
+              SL->Ajc[SL->n*i+j] = SL->Ajc[SL->n*(i-1)+(j+1)];
+              SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[j], i) * pot(SL->x[j], SL->n-1);
+          }
+          SL->Ajc[SL->n*i+(SL->n-1)] += pot(SL->x[SL->n-1], i) * pot(SL->x[SL->n-1], SL->n-1); // Última soma
+      }
   }
 
   // zera os valores de B
@@ -276,11 +277,7 @@ double *SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
       for (unsigned int j=0; j<SL->n; ++j)
           B[i] += SL->A[SL->n*row+j] * pot(SL->x[j], i);
 
-  // separa SL->Ajc em LU
-  if (SL_triangulariza_otimiz(SL, SL->Ajc, B)) return NULL;
-
-  // Realiza substituição LU e retorna polinomio resultante
-  return substituicao(SL, B);
+  return 0;
 }
 
 /*!
@@ -326,9 +323,8 @@ static void trocaElemento(double *a, double *b)
 */
 static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
 
-    /*
+#if 0 // Versão com realocação
     double aux = malloc(n*sizeof(double));
-
     if(!aux) {
         perror("Sem memória");
         return -1;
@@ -338,18 +334,16 @@ static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int
     memcpy(&mat[n*j], aux, n*sizeof(double));
 
     free(aux);
-    
-    return 0;
-    */ 
-    // Versão sem realocação
+#else // Versão sem realocação
     double aux;
     double *a = &mat[n*i], *b = &mat[n*j];
 
     for (unsigned int k = 0; k<n; ++k) {
-      aux = *(a+k);
-      *(a+k) = *(b+k);
-      *(b+k) = aux;
+        aux = *(a+k);
+        *(a+k) = *(b+k);
+        *(b+k) = aux;
     }    
+#endif
 }
 
 /*!
@@ -363,16 +357,6 @@ static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int
 */
 int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
   
-    if (!SL->L) {
-        SL->L = SL_alocaMatrix(SL->n, SL->n);
-        if (!SL->L) return -1;
-    }
-    memset(SL->L, 0, SL->n * SL->n * sizeof(double));
-
-    if (!SL->U) {
-        SL->U = SL_alocaMatrix(SL->n, SL->n);
-        if (!SL->U) return -1;
-    }
     memcpy(SL->U, mat, SL->n * SL->n * sizeof(double));
 
     // Transforma a matriz em uma triangular com pivoteamento parcial
@@ -395,7 +379,6 @@ int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
                 SL->U[SL->n*j+k] -= SL->U[SL->n*i+k] * m;
         }
     }
-
     return 0;
 }
 
@@ -435,6 +418,7 @@ int SL_triangulariza(t_sist *SL, double *mat, double *B) {
         }
     }
 
+    if (SL->U) free(SL->U);
     SL->U = copia;
 
     return 0;
