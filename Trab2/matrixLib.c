@@ -234,7 +234,7 @@ double* SL_interpolacao(t_sist *SL, unsigned int row, double *B) {
   memcpy(B, SL->A + SL->n*row, SL->n*sizeof(double));
 
   // separa SL->Int em LU
-  if (SL_triangulariza(SL, SL->Int, B)) return NULL;
+  if (SL_triangulariza_otimiz(SL, SL->Int, B)) return NULL;
 
   // Realiza substituição LU e retorna polinomio resultante
   return substituicao(SL, B);
@@ -277,7 +277,7 @@ double *SL_ajusteDeCurvas(t_sist *SL, unsigned int row, double *B) {
           B[i] += SL->A[SL->n*row+j] * pot(SL->x[j], i);
 
   // separa SL->Ajc em LU
-  if (SL_triangulariza(SL, SL->Ajc, B)) return NULL;
+  if (SL_triangulariza_otimiz(SL, SL->Ajc, B)) return NULL;
 
   // Realiza substituição LU e retorna polinomio resultante
   return substituicao(SL, B);
@@ -361,7 +361,7 @@ static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int
   \param B termos independentes
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza(t_sist *SL, double *mat, double *B) {
+int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
   
     if (!SL->L) {
         SL->L = SL_alocaMatrix(SL->n, SL->n);
@@ -408,46 +408,34 @@ int SL_triangulariza(t_sist *SL, double *mat, double *B) {
   \param B termos independentes
   \return 0 se sucesso e -1 em caso de falha
 */
-int SL_triangulariza_otimiz(t_sist *SL, double *mat, double *B) {
+int SL_triangulariza(t_sist *SL, double *mat, double *B) {
   
-    if (!SL->L) {
-        SL->L = SL_alocaMatrix((SL->n * (SL->n+1))/2, 1);
-        if (!SL->L) return -1;
-    }
-    memset(SL->L, 0, SL->n * SL->n * sizeof(double));
-
-    if (!SL->U) {
-        SL->U = SL_alocaMatrix((SL->n * (SL->n+1))/2, 1);
-        if (!SL->U) return -1;
-    }
-
     double *copia = SL_alocaMatrix(SL->n, SL->n);
     if (!copia) return -1;
-
     memcpy(copia, mat, SL->n * SL->n * sizeof(double));
     
     // Transforma a matriz em uma triangular com pivoteamento parcial
     int pivo;
     for (int i=0; i<SL->n; i++) 
     {
-        pivo = maxValue(SL->U,SL->n,i);
+        pivo = maxValue(copia,SL->n,i);
         if (pivo != i) {
             trocaElemento(B+i, B+pivo); // troca termo independente
-            trocaLinha(SL->U, i, pivo, SL->n);
+            trocaLinha(copia, i, pivo, SL->n);
             trocaLinha(SL->L, i, pivo, SL->n);
         }
 
         SL->L[SL->n*i+i] = 1.0f;
         for (int j=i+1; j<SL->n; j++) {
-            double m = SL->U[SL->n*j+i] / SL->U[SL->n*i+i];
-            SL->U[SL->n*j+i] = 0.0f;
+            double m = copia[SL->n*j+i] / copia[SL->n*i+i];
+            copia[SL->n*j+i] = 0.0f;
             SL->L[SL->n*j+i] = m;
             for (int k=i+1; k<SL->n; k++)
-                SL->U[SL->n*j+k] -= SL->U[SL->n*i+k] * m;
+                copia[SL->n*j+k] -= copia[SL->n*i+k] * m;
         }
     }
 
-    free(copia);
+    SL->U = copia;
 
     return 0;
 }
