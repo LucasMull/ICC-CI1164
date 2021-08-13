@@ -7,92 +7,92 @@ CPU clock:	3.41 GHz
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.407916223 GHz,
+CPU clock:,3.407981711 GHz,
 TABLE,Region Interpolacao,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
 RDTSC Runtime [s],0.000002,
-call count,2,
+call count,5,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,23177
-CPU_CLK_UNHALTED_CORE,FIXC1,25140
-CPU_CLK_UNHALTED_REF,FIXC2,22436
-L2_TRANS_ALL_REQUESTS,PMC0,4443
-L2_RQSTS_MISS,PMC1,1200
+INSTR_RETIRED_ANY,FIXC0,33904
+CPU_CLK_UNHALTED_CORE,FIXC1,49903
+CPU_CLK_UNHALTED_REF,FIXC2,44730
+L2_TRANS_ALL_REQUESTS,PMC0,8040
+L2_RQSTS_MISS,PMC1,1969
 TABLE,Region Interpolacao,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],1.893784e-06,
-Runtime unhalted [s],7.376942e-06,
-Clock [MHz],3818.6403,
-CPI,1.0847,
-L2 request rate,0.1917,
-L2 miss rate,0.0518,
-L2 miss ratio,0.2701,
+Runtime (RDTSC) [s],2.467137e-06,
+Runtime unhalted [s],1.464298e-05,
+Clock [MHz],3802.1129,
+CPI,1.4719,
+L2 request rate,0.2371,
+L2 miss rate,0.0581,
+L2 miss ratio,0.2449,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.407916223 GHz,
+CPU clock:,3.407981711 GHz,
 TABLE,Region AjusteDeCurvas,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000013,
-call count,2,
+RDTSC Runtime [s],0.000019,
+call count,5,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,119557
-CPU_CLK_UNHALTED_CORE,FIXC1,67757
-CPU_CLK_UNHALTED_REF,FIXC2,60634
-L2_TRANS_ALL_REQUESTS,PMC0,7985
-L2_RQSTS_MISS,PMC1,2227
+INSTR_RETIRED_ANY,FIXC0,201014
+CPU_CLK_UNHALTED_CORE,FIXC1,118951
+CPU_CLK_UNHALTED_REF,FIXC2,107352
+L2_TRANS_ALL_REQUESTS,PMC0,16046
+L2_RQSTS_MISS,PMC1,4587
 TABLE,Region AjusteDeCurvas,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],1.274710e-05,
-Runtime unhalted [s],1.988224e-05,
-Clock [MHz],3808.2624,
-CPI,0.5667,
-L2 request rate,0.0668,
-L2 miss rate,0.0186,
-L2 miss ratio,0.2789,
+Runtime (RDTSC) [s],1.944367e-05,
+Runtime unhalted [s],3.490365e-05,
+Clock [MHz],3776.2020,
+CPI,0.5918,
+L2 request rate,0.0798,
+L2 miss rate,0.0228,
+L2 miss ratio,0.2859,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.407916223 GHz,
+CPU clock:,3.407981711 GHz,
 TABLE,Region TriangularizaOtimiz,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000055,
-call count,2,
+RDTSC Runtime [s],0.000065,
+call count,5,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,518558
-CPU_CLK_UNHALTED_CORE,FIXC1,206303
-CPU_CLK_UNHALTED_REF,FIXC2,185026
-L2_TRANS_ALL_REQUESTS,PMC0,10771
-L2_RQSTS_MISS,PMC1,2784
+INSTR_RETIRED_ANY,FIXC0,596445
+CPU_CLK_UNHALTED_CORE,FIXC1,267931
+CPU_CLK_UNHALTED_REF,FIXC2,240264
+L2_TRANS_ALL_REQUESTS,PMC0,20697
+L2_RQSTS_MISS,PMC1,5553
 TABLE,Region TriangularizaOtimiz,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
 Runtime (RDTSC) [s],0.0001,
 Runtime unhalted [s],0.0001,
-Clock [MHz],3799.8084,
-CPI,0.3978,
-L2 request rate,0.0208,
-L2 miss rate,0.0054,
-L2 miss ratio,0.2585,
+Clock [MHz],3800.4193,
+CPI,0.4492,
+L2 request rate,0.0347,
+L2 miss rate,0.0093,
+L2 miss ratio,0.2683,
 STRUCT,Info,3
 CPU name:,Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz,
 CPU type:,Intel Coffeelake processor,
-CPU clock:,3.407916223 GHz,
+CPU clock:,3.407981711 GHz,
 TABLE,Region Triangulariza,Group 1 Raw,L2CACHE,5
 Region Info,Core 3,
-RDTSC Runtime [s],0.000088,
-call count,2,
+RDTSC Runtime [s],0.000211,
+call count,5,
 Event,Counter,Core 3
-INSTR_RETIRED_ANY,FIXC0,937823
-CPU_CLK_UNHALTED_CORE,FIXC1,337974
-CPU_CLK_UNHALTED_REF,FIXC2,303596
-L2_TRANS_ALL_REQUESTS,PMC0,11878
-L2_RQSTS_MISS,PMC1,3235
+INSTR_RETIRED_ANY,FIXC0,2337449
+CPU_CLK_UNHALTED_CORE,FIXC1,828641
+CPU_CLK_UNHALTED_REF,FIXC2,744648
+L2_TRANS_ALL_REQUESTS,PMC0,28710
+L2_RQSTS_MISS,PMC1,8031
 TABLE,Region Triangulariza,Group 1 Metric,L2CACHE,7
 Metric,Core 3,
-Runtime (RDTSC) [s],0.0001,
-Runtime unhalted [s],0.0001,
-Clock [MHz],3793.8151,
-CPI,0.3604,
-L2 request rate,0.0127,
+Runtime (RDTSC) [s],0.0002,
+Runtime unhalted [s],0.0002,
+Clock [MHz],3792.3870,
+CPI,0.3545,
+L2 request rate,0.0123,
 L2 miss rate,0.0034,
-L2 miss ratio,0.2724,
+L2 miss ratio,0.2797,

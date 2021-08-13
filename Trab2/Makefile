@@ -7,7 +7,7 @@ ifeq ($(build),debug)
 	CFLAGS := -D_NO_LIKWID
 	LFLAGS :=
 else
-	CFLAGS := -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
+	CFLAGS := -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx -march=native
 	LFLAGS := -L${LIKWID_LIB} -llikwid -lm
 endif
 
