@@ -3,8 +3,13 @@ PROG  = matrixInv
 CC   = gcc -std=c11 -g
 OBJS = matrixLib.o
 
-CFLAGS = -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
-LFLAGS = -L${LIKWID_LIB} -llikwid -lm
+ifeq ($(build),debug)
+	CFLAGS := -D_NO_LIKWID
+	LFLAGS :=
+else
+	CFLAGS := -DLIKWID_PERFMON -I${LIKWID_INCLUDE} -O3 -mavx2 -march=native
+	LFLAGS := -L${LIKWID_LIB} -llikwid -lm
+endif
 
 .PHONY: all debug clean limpa purge faxina
 

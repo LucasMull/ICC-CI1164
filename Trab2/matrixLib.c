@@ -8,7 +8,6 @@
 #include <string.h> // memcpy()
 #include <math.h>
 
-#include "utils.h"
 #include "matrixLib.h"
 
 /*!
