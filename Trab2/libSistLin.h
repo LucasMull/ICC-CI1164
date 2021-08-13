@@ -3,8 +3,8 @@
  * Lucas Müller          | GRR20197160
  */
 
-#ifndef __MATRIXLIB__
-#define __MATRIXLIB__
+#ifndef __LIBSISTLIN__
+#define __LIBSISTLIN__
 
 typedef struct {
     unsigned int n, m;
@@ -28,4 +28,4 @@ int SL_triangulariza(t_sist *SL);
 int SL_triangulariza_otimiz(t_sist *SL);
 void SL_substituicao(t_sist *SL, double *pol);
 
-#endif // __MATRIXLIB__
+#endif // __LIBSISTLIN__

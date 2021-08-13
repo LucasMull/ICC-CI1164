@@ -15,7 +15,7 @@
 #define LIKWID_MARKER_STOP(a)
 #endif
 
-#include "matrixLib.h"
+#include "libSistLin.h"
 
 
 int main (int argc, char **argv) {
@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
             if (SL_triangulariza_otimiz(Int)) return EXIT_FAILURE;
 
             SL_substituicao(Int, pol);
-            //SL_printMatrix(stderr, pol, SL->n, 1);
+            SL_printMatrix(stdout, pol, SL->n, 1);
 	    
             LIKWID_MARKER_START("AjusteDeCurvas");
             if (SL_ajusteDeCurvas(SL, Ajc, i, lookup)) return EXIT_FAILURE;
@@ -63,7 +63,7 @@ int main (int argc, char **argv) {
 	    SL_substituicao(Ajc, pol);
             LIKWID_MARKER_STOP("TriangularizaOtimiz");
 
-            //SL_printMatrix(stderr, pol, SL->n, 1);
+            SL_printMatrix(stdout, pol, SL->n, 1);
 
             LIKWID_MARKER_START("Triangulariza");
             if (SL_triangulariza(Ajc)) return EXIT_FAILURE;

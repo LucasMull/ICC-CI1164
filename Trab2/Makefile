@@ -1,7 +1,7 @@
-PROG  = matrixInv
+PROG  = geraPolinomio
 
 CC   = gcc -std=c11 -g
-OBJS = matrixLib.o
+OBJS = libSistLin.o
 
 ifeq ($(build),debug)
 	CFLAGS := -D_NO_LIKWID

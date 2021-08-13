@@ -8,26 +8,61 @@
 #include <string.h> // memcpy()
 #include <math.h>
 
-#include "matrixLib.h"
+#include "libSistLin.h"
+
 
 /*!
- * \brief Retorna base elevada a um expoente inteiro
- *
- * \param base o valor a ser exponencializado
- * \param expoente o expoente da base
- * \return o resultado da potencialização
- */
-static inline double pot(double base, unsigned int expoente) {
+  \brief Troca elementos
 
-  if (!expoente) return 1.0f;
+  \param a elemento a
+  \param b elemento b
+*/
+static void trocaElemento(double *a, double *b)
+{
+  double aux;
 
-  double aux = base;
-  for (unsigned int i=1; i < expoente; ++i)
-      base *= aux;
-  return base;
+  aux = *a;
+  *a = *b;
+  *b = aux;
 }
 
-static void trocaElemento(double *a, double *b);
+/*!
+  \brief Troca linhas de SL->A
+
+  \param matrix a matriz
+  \param i linha a ser trocada com j
+  \param j linha a ser trocada com i
+  \return 0 para sucesso e -1 para falha
+*/
+static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
+
+    double aux;
+    double *a = &mat[n*i], *b = &mat[n*j];
+
+    for (unsigned int k = 0; k<n; ++k) {
+        aux = *(a+k);
+        *(a+k) = *(b+k);
+        *(b+k) = aux;
+    }    
+}
+
+/*!
+  \brief Encontra o maior valor em uma coluna da matriz
+
+  \param matrix a matriz
+  \param n dimensao da matriz
+  \param j coluna
+  \return indice da coluna com max
+*/
+static unsigned int maxValue(double *matrix, unsigned int n, unsigned int j) {
+
+    unsigned int max = j;
+
+    for (int i=max+1; i<n; i++)
+        if (fabs(matrix[n*i+j]) > fabs(matrix[n*max+j]))
+            max = i;
+    return max;
+}
 
 /*!
  * \brief Substituição LU
@@ -91,6 +126,7 @@ t_sist *SL_aloca(unsigned int n, unsigned int m) {
   }
   newSL->x = calloc(1, n * sizeof(double));
   if (!newSL->x) {
+      perror("Falha ao alocar matriz");
       free(newSL->A);
       free(newSL);
       return NULL;
@@ -290,59 +326,6 @@ int SL_ajusteDeCurvas(t_sist *SL, t_sist *Ajc, unsigned int row, double *lookup)
           Ajc->B[i] += SL->A[SL->n*row+j] * lookup[SL->n*i+j];
 
   return 0;
-}
-
-/*!
-  \brief Encontra o maior valor em uma coluna da matriz
-
-  \param matrix a matriz
-  \param n dimensao da matriz
-  \param j coluna
-  \return indice da coluna com max
-*/
-static unsigned int maxValue(double *matrix, unsigned int n, unsigned int j) {
-
-    unsigned int max = j;
-
-    for (int i=max+1; i<n; i++)
-        if (fabs(matrix[n*i+j]) > fabs(matrix[n*max+j]))
-            max = i;
-    return max;
-}
-
-/*!
-  \brief Troca elementos
-
-  \param a elemento a
-  \param b elemento b
-*/
-static void trocaElemento(double *a, double *b)
-{
-  double aux;
-
-  aux = *a;
-  *a = *b;
-  *b = aux;
-}
-
-/*!
-  \brief Troca linhas de SL->A
-
-  \param matrix a matriz
-  \param i linha a ser trocada com j
-  \param j linha a ser trocada com i
-  \return 0 para sucesso e -1 para falha
-*/
-static void trocaLinha(double *mat, unsigned int i, unsigned int j, unsigned int n) {
-
-    double aux;
-    double *a = &mat[n*i], *b = &mat[n*j];
-
-    for (unsigned int k = 0; k<n; ++k) {
-        aux = *(a+k);
-        *(a+k) = *(b+k);
-        *(b+k) = aux;
-    }    
 }
 
 /*!
