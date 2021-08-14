@@ -11,15 +11,15 @@ set xlabel  "Tamanho (N)"
 #
 # ALTERNATIVA 1: Tabelas em arquivos separados (2 colunas)
 #
-set ylabel  "Miss Ratio"
-set title   "Cache Miss Ratio L2"
-set terminal qt 0 title "Cache Miss Ratio L2"
-plot '< sort -nk1 cmiss_ajc.csv' using 1:2 title "Miss Ratio x Tamanho" with linespoints
+set ylabel  "Memory Bandwidth[MBytes/s]"
+set title   "Banda de Memória"
+set terminal qt 0 title "Banda de Memória"
+plot '< sort -nk1 mem_ajc.csv' using 1:2 title "MBytes/s x Tamanho" with linespoints
 
 # Gerando figura PNG
 set terminal png
-set output "cmiss_ajc.png"
-plot '< sort -nk1 cmiss_ajc.csv' using 1:2 title "Miss Ratio x Tamanho" with linespoints
+set output "mem_ajc.png"
+plot '< sort -nk1 mem_ajc.csv' using 1:2 title "MBytes/s x Tamanho" with linespoints
 
 
 replot
