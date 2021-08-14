@@ -11,8 +11,7 @@ BEGIN {
 
 BEGINFILE {
   type = ""
- sdhasqw
- size = ""
+  size = ""
   table = ""
 
   match(FILENAME, /_[0-9]*.txt$/)
